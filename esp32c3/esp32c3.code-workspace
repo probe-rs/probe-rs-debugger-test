@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"rust-analyzer.checkOnSave.command": "clippy",
+		"rust-analyzer.cargo.target": "riscv32imc-unknown-none-elf", // TODO: Replace target identity
+		"editor.formatOnSave": true
+	}
+}

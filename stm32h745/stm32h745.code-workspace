@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"rust-analyzer.checkOnSave.command": "clippy",
+		"rust-analyzer.cargo.target": "thumbv7em-none-eabihf", // TODO: Replace target identity
+		"editor.formatOnSave": true
+	}
+}
