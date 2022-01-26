@@ -22,4 +22,4 @@ rustflags = ["-C", "link-arg=-Tesp32c3-link.x"]
 
 [build]
 # TODO: Replace target identifier
-target = "riscv32imc-unknown-none-elf"
+target = "riscv32imac-unknown-none-elf"

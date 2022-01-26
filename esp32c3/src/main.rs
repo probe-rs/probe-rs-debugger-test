@@ -15,6 +15,7 @@ use panic_halt as _;
 // use cortex_m::asm;
 // use cortex_m_rt::entry;
 // TODO: Uncomment for RISCV
+use riscv_atomic_emulation_trap as _;
 use riscv_rt::entry;
 
 // Definitions for testing debugger with various datatypes

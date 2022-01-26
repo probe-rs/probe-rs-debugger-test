@@ -15,7 +15,7 @@
             "args": [
                 "build",
                 "--target",
-                "riscv32imc-unknown-none-elf" // TODO: Update target identifier
+                "riscv32imac-unknown-none-elf" // TODO: Update target identifier
             ],
             "problemMatcher": [
                 "$rustc"
