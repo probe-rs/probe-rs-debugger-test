@@ -15,15 +15,11 @@ name = "esp32c3"     # TODO: Update binary name
 path = "src/main.rs"
 
 [dependencies]
-# Dependencies for specific hardware
-# TODO: Uncomment for Cortex-M
-# cortex-m = "0.7"
-# cortex-m-rt = "0.7"
-# rtt-target = { version = "0.3.1", features = ["cortex-m"] }
-# TODO: Uncomment for RISCV
-riscv-rt = "0.8"
-riscv-atomic-emulation-trap = { git = "https://github.com/esp-rs/riscv-atomic-emulation-trap" }
-# rtt-target = { version = "0.3.1", features = ["riscv"] }
+# TODO: Code specific to  RISCV
+riscv-rt = "0.8.1"
+# NOTE: We need this very handy atomic-emulation-trap to allow RTT to work on this chip.
+riscv-atomic-emulation-trap = { path = "../../riscv-atomic-emulation-trap" }
+rtt-target = { version = "0.3.1", features = ["riscv"] }
 panic-halt = "0.2.0"
 
 # Dependencies shared between different hardware

@@ -13,6 +13,12 @@
 			"path": "esp32c3"
 		},
 		{
+			"path": "stm32h745"
+		},
+		{
+			"path": "pico"
+		},
+		{
 			"path": "stm32h745-defmt-rtt"
 		}
 	],

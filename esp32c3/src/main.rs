@@ -6,15 +6,11 @@
 #![allow(unused_assignments)]
 
 use heapless::Vec;
-// use panic_probe as _;
 use panic_halt as _;
 
-// use rtt_target::{rprintln, rtt_init_print};
+use rtt_target::{rprintln, rtt_init_print};
 
-// TODO: Uncomment for Cortex-M
-// use cortex_m::asm;
-// use cortex_m_rt::entry;
-// TODO: Uncomment for RISCV
+// TODO: Code specific to RISCV
 use riscv_atomic_emulation_trap as _;
 use riscv_rt::entry;
 
@@ -231,11 +227,11 @@ fn main() -> ! {
     heapless_vec.push(2).ok();
     heapless_vec.push(3).ok();
 
-    // rtt_init_print!();
+    rtt_init_print!();
 
     #[allow(clippy::empty_loop)]
     loop {
-        // rprintln!("Inside the main() loop ... before asm::");
+        rprintln!("Inside the main() loop ... before asm::");
         // asm::delay(100_000);
     }
 }

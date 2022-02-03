@@ -9,11 +9,9 @@ use heapless::Vec;
 use panic_probe as _;
 use rtt_target::{rprintln, rtt_init_print};
 
-// TODO: Uncomment for Cortex-M
+// TODO: Code specific to Cortex-M
 use cortex_m::asm;
 use cortex_m_rt::entry;
-// TODO: Uncomment for RISCV
-// use riscv_rt::entry;
 
 // Definitions for testing debugger with various datatypes
 // N.B. These are `mut` only so they don't constant fold away.
@@ -116,6 +114,8 @@ fn basic_types_with_err_result() -> Result<(), &'static str> {
     let f64_val: f64 = 3.5;
     let f64_ref: &f64 = &f64_val;
 
+    let nested_inline_function = assoc_local(2);
+
     Err("Forcing the return of an Error variant")
 }
 trait TraitWithAssocType {
@@ -143,6 +143,7 @@ enum Enum<T: TraitWithAssocType> {
 
 fn assoc_struct<T: TraitWithAssocType>(arg: Struct<T>) {}
 
+#[inline(always)]
 fn assoc_local<T: TraitWithAssocType>(x: T) {
     let inferred = x.get_value();
     let explicitly: T::Type = x.get_value();

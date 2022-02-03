@@ -12,14 +12,9 @@ debug
 --reset-after-flashing
 --program-binary
 """
-# runner = "probe-run --chip STM32H745ZITx"
 
-# TODO: Uncomment for Cortex-M
 # TODO: Ensure appropriate `memory.x` linker script is present in the project root folder
 rustflags = ["-C", "link-arg=-Tlink.x", "-C", "link-arg=-Tdefmt.x"]
-# TODO: Uncomment for RISCV
-# rustflags = ["-C", "link-arg=-Tesp32c3-link.x"]
-
 
 [build]
 # TODO: Replace target identifier 

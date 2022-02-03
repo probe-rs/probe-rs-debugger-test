@@ -18,7 +18,7 @@
             "flashingEnabled": true,
             "resetAfterFlashing": true,
             "haltAfterReset": false,
-            "rttEnabled": true,
+            "rttEnabled": false,
             "rttChannelFormats": [
                 {
                     "channelNumber": 0,

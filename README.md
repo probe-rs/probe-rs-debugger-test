@@ -5,8 +5,9 @@ The applications in this repo are all very similar in their `main.rs`. The purpo
 - `stm32h745-defmt-rtt`: Similar to above, except it uses `defmt` for RTT
 - `nrf52833`: A sample applciation for Cortex-M4 on a Micro:Bit v2 board
 - `esp32c3` : A sample configuration for RISCV platform
+- `pico`    : A sample configuration for Cortex-M0 on Raspberry PICO RP2040, that uses a second PICO as a probe.
 
-To customize or create additional application, simply copy the contents of a similar architecture, and look for the `TODO:` comment tag in all the files to identify the changes needed to support a specific architecture.
+To customize or create additional application, simply copy the contents of a similar architecture, and look for the `TODO:` comment tag in all the files to identify the changes needed to support a specific architecture or board.
 
 ## Usage notes: 
 - **VSCode debug extension** for `probe-rs-debugger`: Look at the `.vscode/launch.json` file for typical setup values.

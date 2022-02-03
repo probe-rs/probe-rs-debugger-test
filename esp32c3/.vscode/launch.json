@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "preLaunchTask": "${defaultBuildTask}",
+            "preLaunchTask": "esp32c3",
             "type": "probe-rs-debug",
             "request": "launch",
             "name": "probe-rs esp32c3",
@@ -18,13 +18,13 @@
             "flashingEnabled": true,
             "resetAfterFlashing": true,
             "haltAfterReset": false,
-            // "rttEnabled": true,
-            // "rttChannelFormats": [
-            //     {
-            //         "channelNumber": 0,
-            //         "showTimestamps": true
-            //     }
-            // ],
+            "rttEnabled": true,
+            "rttChannelFormats": [
+                {
+                    "channelNumber": 0,
+                    "showTimestamps": true
+                }
+            ],
             "consoleLogLevel": "Debug",
             "speed": 24000 // TODO: Optionally update USB speed
         }
