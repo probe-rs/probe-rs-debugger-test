@@ -6,7 +6,7 @@
             "type": "probe-rs-debug",
             "request": "launch",
             "name": "probe-rs STM32H745",
-            "server": "127.0.0.1:50001", // For connecting to an existing probe-rs-debugger process
+            // "server": "127.0.0.1:50001", // For connecting to an existing probe-rs-debugger process
             // TODO: Update with project name
             // TODO: Update target folder
             "cwd": "${workspaceFolder}",
@@ -16,8 +16,8 @@
             "runtimeExecutable": "probe-rs-debugger",
             "connectUnderReset": true,
             "flashingEnabled": true,
-            "resetAfterFlashing": true,
-            "haltAfterReset": false,
+            "resetAfterFlashing": false,
+            "haltAfterReset": true,
             "rttEnabled": true,
             "rttChannelFormats": [
                 {

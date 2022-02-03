@@ -9,11 +9,9 @@ use heapless::Vec;
 use panic_probe as _;
 use rtt_target::{rprintln, rtt_init_print};
 
-// TODO: Uncomment for Cortex-M
+// TODO: Code specific to Cortex-M
 use cortex_m::asm;
 use cortex_m_rt::entry;
-// TODO: Uncomment for RISCV
-// use riscv_rt::entry;
 
 // Definitions for testing debugger with various datatypes
 // N.B. These are `mut` only so they don't constant fold away.
@@ -165,7 +163,7 @@ fn assoc_enum<T: TraitWithAssocType>(arg: Enum<T>) {
 
 #[entry]
 fn main() -> ! {
-    static LOCAL_STATIC: &str = "A 'local' to main() static variable";
+    static mut LOCAL_STATIC: &str = "A 'local' to main() static variable";
     let int8: i8 = 23;
     let int128: i128 = -196710231994021419720322;
     let u_int128: u128 = 196710231994021419720322;

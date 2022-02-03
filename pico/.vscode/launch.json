@@ -2,25 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "preLaunchTask": "stm32h745-defmt-rtt",
+            "preLaunchTask": "RP2040",
             "type": "probe-rs-debug",
             "request": "launch",
-            "name": "probe-rs STM32H745 Defmt RTT",
+            "name": "probe-rs RP2040",
             // "server": "127.0.0.1:50001", // For connecting to an existing probe-rs-debugger process
             // TODO: Update with project name
             // TODO: Update target folder
             "cwd": "${workspaceFolder}",
-            "programBinary": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/stm32h745-defmt-rtt", // TODO: Update with binary name
-            "chip": "STM32H745ZITx", // TODO: Update with chip name
+            "programBinary": "${workspaceFolder}/target/thumbv6m-none-eabi/debug/pico", // TODO: Update with binary name
+            "chip": "RP2040", // TODO: Update with chip name
             "coreIndex": 0,
             "runtimeExecutable": "probe-rs-debugger",
-            "connectUnderReset": true,
+            "connectUnderReset": false,
             "flashingEnabled": true,
             "resetAfterFlashing": true,
-            "haltAfterReset": true,
-            "rttEnabled": false,
-            "consoleLogLevel": "Info",
-            "speed": 24000 // TODO: Optionally update USB speed
+            "haltAfterReset": false,
+            "rttEnabled": true,
+            "consoleLogLevel": "Warn",
+            "speed": 2000 // TODO: Optionally update USB speed
         }
     ]
 }

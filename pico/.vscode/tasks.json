@@ -9,13 +9,13 @@
              * but we need to provide a label for it,
              * so we can invoke it from the debug launcher.
              */
-            "label": "esp32c3",
+            "label": "RP2040",
             "type": "process",
             "command": "cargo",
             "args": [
                 "build",
                 "--target",
-                "riscv32imac-unknown-none-elf" // TODO: Update target identifier
+                "thumbv6m-none-eabi" // TODO: Update target identifier
             ],
             "problemMatcher": [
                 "$rustc"

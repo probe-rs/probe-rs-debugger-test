@@ -1,6 +1,6 @@
 [package]
-name = "nrf52833"                                                                                      # TODO: Update project name
-description = "Test the probe-rs-debugger (and optionally VSCode extension) against Micro:Bit 2 board"
+name = "RP2040"                                                                                           # TODO: Update project name
+description = "Test the probe-rs-debugger (and optionally VSCode extension) against Raspberry PICO board"
 version = "0.1.0"
 authors = ["Jack Noppe <noppej@hotmail.com>"]
 edition = "2021"
@@ -11,15 +11,21 @@ autotests = false
 autobenches = false
 
 [[bin]]
-name = "nrf52833"    # TODO: Update binary name
+name = "pico"        # TODO: Update binary name
 path = "src/main.rs"
 
 [dependencies]
 # Dependencies for specific hardware
-# TODO: Code specific to Cortex-M
+# TODO: Code specific to  Cortex-M
 cortex-m = "0.7.4"
 cortex-m-rt = "0.7.1"
 rtt-target = { version = "0.3.1", features = ["cortex-m"] }
+
+# TODO: Code specific to this board - BEGIN
+embedded-hal = { version = "0.2.5", features = ["unproven"] }
+embedded-time = "0.12.0"
+rp-pico = "0.2.0"
+# TODO: Code specific to this board - END
 
 # Dependencies shared between different hardware
 heapless = { version = "0.7.9", default-features = false }
