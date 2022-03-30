@@ -1,17 +1,35 @@
 # Some sample applications to test `probe-rs-debugger`
 
-The applications in this repo are all very similar in their `main.rs`. The purpose is to allow consistent testing of `probe-rs-debugger`, and also to show some default configurations that users can template to enable `probe-rs-debugger` accross different hardware platforms/architectures.
-- `stm32h745`: A sample application for Cortex-M7 on a ST Nucleo H745ZI-Q board
-- `stm32h745-defmt-rtt`: Similar to above, except it uses `defmt` for RTT
-- `nrf52833`: A sample applciation for Cortex-M4 on a Micro:Bit v2 board
-- `esp32c3` : A sample configuration for RISCV platform
-- `pico`    : A sample configuration for Cortex-M0 on Raspberry PICO RP2040, that uses a second PICO as a probe.
+The application in this repo are designed to allow consistent testing of `probe-rs-debugger`, and also to show some default configurations that users can template to enable `probe-rs-debugger` accross different hardware platforms/architectures.
 
-To customize or create an additional application, simply copy the contents of a similar architecture, and look for the `TODO:` comment tag in all the files to identify the changes needed to support a specific architecture or board.
+The application can be run on mulitple architectures, and is controlled by conditional compile features, which are keyed on the chip name as reported by `probe-rs-debugger list-chips`. The following chips / features are pre-configured for use: 
+- `STM32H745ZITx_memory`
+    - ARM Cortex-M7 core on a ST Nucleo H745ZI-Q board
+- `nRF52833_xxAA`
+    - ARM Cortex-M4 on a Micro:Bit v2 board
+- `esp32c3`
+    - RISCV on an Espressif ESP32-C3 board
+- `RP2040`
+    - ARM Cortex-M0 on Raspberry PICO RP2040, that uses a second PICO as a probe.
 
 ## Usage notes: 
-- **VSCode debug extension** for `probe-rs-debugger`: Look at the `.vscode/launch.json` file for typical setup values.
-- **Command line (CLI)** invocation of `probe-rs-debugger`: Look at the `.cargo/config.toml` file for typical setup values to enable `probe-rs-debugger` as the runner for `cargo run`
+Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
+- The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust to the chipname configured in the specific `<chipname>.code-workspace` file.
+- Simply open the appropriate workspace file with 'Open Workspace from File ...', and you should be ready to debug.
 
-## TODO:
-The subfolders contain a lot of duplicated code. I am open to suggestions on how to share more code between the various targets without tripping up `rust-analyzer`.
+## Adding support new chips
+Support for new chips, can be added by making the following modifications, using the appropriate chip name from `probe-rs-debugger list-chips`
+1. Copy one of the existing VSCode workspace files to an new file named: `<chipname>.code_workspace`
+    - Update all locations marked with a **// CONFIGURE:** comment.
+2.Edit the `Cargo.toml` file:
+    - Add a [feature] for your chip.
+    - If your feature uses a different [target.\<triple>] , then create a new dependency for it, using the existing target platforms as a template.
+3. Edit the `src/main.rs` file: 
+    - Add your chip [feature] to the existing conditional compile structures, or add new ones if your chip requires custom crates.
+4. Add the appropriate linker file to the `linker_files` folder. 
+    - Note, it must be named "<chip_name>_memory.x"
+5. Add the appropriate CMSIS-SVD file to the `svd_files` folder. 
+    - Note, it must be named "<chip_name>.svd"
+
+
+
