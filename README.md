@@ -6,10 +6,13 @@ The application can be run on mulitple architectures, and is controlled by condi
 - `STM32H745ZITx_memory`
     - ARM Cortex-M7 core on a ST Nucleo H745ZI-Q board
 - `nRF52833_xxAA`
+    - WIP: Untested and unsupported
     - ARM Cortex-M4 on a Micro:Bit v2 board
 - `esp32c3`
+    - WIP: Untested and unsupported
     - RISCV on an Espressif ESP32-C3 board
 - `RP2040`
+    - WIP: Untested and unsupported
     - ARM Cortex-M0 on Raspberry PICO RP2040, that uses a second PICO as a probe.
 
 ## Usage notes: 
