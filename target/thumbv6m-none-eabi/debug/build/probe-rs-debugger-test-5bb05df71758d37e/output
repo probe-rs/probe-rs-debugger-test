@@ -1,0 +1,7 @@
+cargo:rustc-link-arg-bins=-Tlink.x
+cargo:rustc-link-search=/Users/jacknoppe/dev/probe-rs-debugger-test/target/thumbv6m-none-eabi/debug/build/probe-rs-debugger-test-5bb05df71758d37e/out
+cargo:rerun-if-changed=build.rs
+cargo:rerun-if-changed=linker_files/esp32c3_memory.x
+cargo:rerun-if-changed=linker_files/STM32H745ZITx_memory.x
+cargo:rerun-if-changed=linker_files/RP2040_memory.x
+cargo:rerun-if-changed=linker_files/nRF52833_xxAA_memory.x
