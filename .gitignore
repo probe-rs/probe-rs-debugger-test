@@ -1,6 +1,5 @@
 **/target
 **/*.rs.bk
-Cargo.lock
 
 # It's a Mac Thing
 **/.DS_Store 

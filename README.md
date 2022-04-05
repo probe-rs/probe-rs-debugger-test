@@ -3,7 +3,7 @@
 The application in this repo are designed to allow consistent testing of `probe-rs-debugger`, and also to show some default configurations that users can template to enable `probe-rs-debugger` accross different hardware platforms/architectures.
 
 The application can be run on mulitple architectures, and is controlled by conditional compile features, which are keyed on the chip name as reported by `probe-rs-debugger list-chips`. The following chips / features are pre-configured for use: 
-- `STM32H745ZITx_memory`
+- `STM32H745ZITx`
     - ARM Cortex-M7 core on a ST Nucleo H745ZI-Q board
 - `nRF52833_xxAA`
     - ARM Cortex-M4 on a Micro:Bit v2 board
@@ -17,7 +17,7 @@ Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
 - The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust to the chipname configured in the specific `<chipname>.code-workspace` file.
 - Simply open the appropriate workspace file with 'Open Workspace from File ...', and you should be ready to debug.
 
-## Adding support new chips
+## Adding support for new chips
 Support for new chips, can be added by making the following modifications, using the appropriate chip name from `probe-rs-debugger list-chips`
 1. Copy one of the existing VSCode workspace files to an new file named: `<chipname>.code_workspace`
     - Update all locations marked with a **// CONFIGURE:** comment.
