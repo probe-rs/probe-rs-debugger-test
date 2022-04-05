@@ -439,7 +439,7 @@ fn main() -> ! {
             "Recursive call # {} in `test_deep_stack`",
             internal_depth_measure
         );
-        if internal_depth_measure <= 35 {
+        if internal_depth_measure <= 45 {
             test_deep_stack(internal_depth_measure);
         } else {
             rprintln!("Dropping out of the deep recursive stack test");

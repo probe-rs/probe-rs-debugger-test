@@ -36,8 +36,6 @@ panic-probe = { version = "0.2", features = ["print-rtt"] }
 [target.riscv32imac-unknown-none-elf.dependencies]
 riscv = { git = "https://github.com/rust-embedded/riscv" }
 riscv-rt = { version = "0.8.1" }
-# NOTE: We need this very handy atomic-emulation-trap to allow RTT to work on this chip.
-# riscv-atomic-emulation-trap = { git = "https://github.com/esp-rs/riscv-atomic-emulation-trap", branch = "master" }
 panic-halt = { version = "0.2.0" }
 rtt-target = { version = "0.3.1", features = ["riscv"] }
 
@@ -51,7 +49,6 @@ nrf52833-hal = { version = "0.15.0", git = "https://github.com/nrf-rs/nrf-hal", 
     "rt",
 ], optional = true }
 rp-pico = { version = "0.3.0", optional = true }
-# esp32c3 = { version = "0.3.0", optional = true }
 esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", optional = true }
 
 
