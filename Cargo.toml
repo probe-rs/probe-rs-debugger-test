@@ -1,0 +1,61 @@
+[package]
+name = "probe-rs-debugger-test"
+description = "Test the probe-rs-debugger (and optionally VSCode extension) against various chips/boards"
+version = "0.2.0"
+authors = ["Jack Noppe <noppej@hotmail.com>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
+
+[[bin]]
+name = "probe-rs-debugger-test"
+path = "src/main.rs"
+
+[features]
+STM32H745ZITx = []
+nRF52833_xxAA = ["nrf52833-hal"]
+RP2040 = ["embedded-time", "rp-pico", "embedded-hal"]
+esp32c3 = ["esp32c3-hal"]
+
+
+[target.thumbv6m-none-eabi.dependencies]
+cortex-m = { version = "0.7" }
+cortex-m-rt = { version = "0.7" }
+rtt-target = { version = "0.3.1", features = ["cortex-m"] }
+panic-probe = { version = "0.2", features = ["print-rtt"] }
+
+[target.thumbv7em-none-eabihf.dependencies]
+cortex-m = { version = "0.7" }
+cortex-m-rt = { version = "0.7" }
+rtt-target = { version = "0.3.1", features = ["cortex-m"] }
+panic-probe = { version = "0.2", features = ["print-rtt"] }
+
+[target.riscv32imac-unknown-none-elf.dependencies]
+riscv = { git = "https://github.com/rust-embedded/riscv" }
+riscv-rt = { version = "0.8.1" }
+# NOTE: We need this very handy atomic-emulation-trap to allow RTT to work on this chip.
+# riscv-atomic-emulation-trap = { git = "https://github.com/esp-rs/riscv-atomic-emulation-trap", branch = "master" }
+panic-halt = { version = "0.2.0" }
+rtt-target = { version = "0.3.1", features = ["riscv"] }
+
+[dependencies]
+# Dependencies shared between different hardware
+heapless = { version = "0.7.9", default-features = false }
+# Feature specific dependencies
+embedded-hal = { version = "^0.2.7", features = ["unproven"], optional = true }
+embedded-time = { version = "0.12.1", optional = true }
+nrf52833-hal = { version = "0.15.0", git = "https://github.com/nrf-rs/nrf-hal", folder = "nrf52833-hal", features = [
+    "rt",
+], optional = true }
+rp-pico = { version = "0.3.0", optional = true }
+# esp32c3 = { version = "0.3.0", optional = true }
+esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal", optional = true }
+
+
+[profile.dev]
+codegen-units = 1 # better optimizations and easier ELF to debug the debugger
+debug = true      # default is `false`; using `true` is also OK as the symbols reside on the host platform, not the target
+lto = false       # better optimizations
