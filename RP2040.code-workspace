@@ -8,7 +8,8 @@
         "rust-analyzer.checkOnSave.command": "clippy",
         "rust-analyzer.cargo.target": "thumbv6m-none-eabi", // CONFIGURE: Replace target identity
         "rust-analyzer.cargo.features": [
-            "RP2040" // CONFIGURE: Replace target feature
+            "RP2040", // CONFIGURE: Replace target feature
+            "cafe","4005" // CONFIGURE: Replace target VID:PID for your probe
         ],
         "editor.formatOnSave": true
     }

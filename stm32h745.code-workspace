@@ -8,7 +8,8 @@
 		"rust-analyzer.checkOnSave.command": "clippy",
 		"rust-analyzer.cargo.target": "thumbv7em-none-eabihf", // CONFIGURE: Replace target identity
 		"rust-analyzer.cargo.features": [
-			"STM32H745ZITx" // CONFIGURE: Replace target feature
+			"STM32H745ZITx", // CONFIGURE: Replace target feature
+			"0483","374e" // CONFIGURE: Replace target VID:PID
 		],
 		"editor.formatOnSave": true
 	}

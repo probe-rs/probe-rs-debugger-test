@@ -33,13 +33,13 @@ fn main() {
     ))]
     println!("cargo:rustc-link-arg-bins=-Tlink.x");
 
-    #[cfg(feature = "esp32c3")]
-    let link_bytes = include_bytes!("linker_files/esp32c3_memory.x");
-    #[cfg(feature = "esp32c3")]
-    File::create(out.join("linkall.x"))
-        .unwrap()
-        .write_all(link_bytes)
-        .unwrap();
+    // #[cfg(feature = "esp32c3")]
+    // let link_bytes = include_bytes!("linker_files/esp32c3_memory.x");
+    // #[cfg(feature = "esp32c3")]
+    // File::create(out.join("linkall.x"))
+    //     .unwrap()
+    //     .write_all(link_bytes)
+    //     .unwrap();
     #[cfg(feature = "esp32c3")]
     println!("cargo:rustc-link-arg-bins=-Tlinkall.x");
 
