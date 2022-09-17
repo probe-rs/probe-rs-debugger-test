@@ -5,12 +5,13 @@
         }
     ],
     "settings": {
-        "rust-analyzer.checkOnSave.command": "clippy",
-        "rust-analyzer.cargo.target": "riscv32imac-unknown-none-elf", // CONFIGURE: Replace target identity
+        "probe-rs-chipname": "esp32c3", // CONFIGURE: Replace target feature
         "rust-analyzer.cargo.features": [
             "esp32c3", // CONFIGURE: Replace target feature
-            "303a","1001" // CONFIGURE: Replace target VID:PID for your probe
         ],
+        "probe-rs-vid-pid": "303a:1001", // CONFIGURE: Replace with your probe's VID:PID
+        "rust-analyzer.checkOnSave.command": "clippy",
+        "rust-analyzer.cargo.target": "riscv32imac-unknown-none-elf", // CONFIGURE: Replace target identity
         "editor.formatOnSave": true,
     }
 }

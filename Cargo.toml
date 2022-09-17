@@ -16,17 +16,9 @@ path = "src/main.rs"
 
 [features]
 STM32H745ZITx = []
-0483 = []                                             # CONFIGURE: Rename with target PID for your probe
-374e = []                                             # CONFIGURE: Rename with target VID for your probe
 nRF52833_xxAA = ["nrf52833-hal"]
-0d28 = []                                             # CONFIGURE: Rename with target PID for your probe
-0204 = []                                             # CONFIGURE: Rename with target VID for your probe
 RP2040 = ["embedded-time", "rp-pico", "embedded-hal"]
-cafe = []                                             # CONFIGURE: Rename with target PID for your probe
-4005 = []                                             # CONFIGURE: Rename with target VID for your probe
 esp32c3 = ["esp32c3-hal"]
-303a = []                                             # CONFIGURE: Rename with target PID for your probe
-1001 = []                                             # CONFIGURE: Rename with target VID for your probe
 
 
 [target.thumbv6m-none-eabi.dependencies]

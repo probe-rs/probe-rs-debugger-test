@@ -6,15 +6,15 @@
             "type": "probe-rs-debug",
             "request": "launch",
             "name": "probe-rs-debugger",
-            // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process
-            "chip": "${config:rust-analyzer.cargo.features.0}",
+            // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
+            "chip": "${config:probe-rs-chipname}", 
             "cwd": "${workspaceFolder}",
-            "probe": "${config:rust-analyzer.cargo.features.1}:${config:rust-analyzer.cargo.features.2}",
+            "probe": "${config:probe-rs-vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
             "coreConfigs": [
                 {
                     "coreIndex": 0,
                     "programBinary": "${workspaceFolder}/target/${config:rust-analyzer.cargo.target}/debug/probe-rs-debugger-test",
-                    "svdFile": "svd_files/${config:rust-analyzer.cargo.features.0}.svd",
+                    "svdFile": "svd_files/${config:probe-rs-chipname}.svd",
                     "rttEnabled": true,
                     "rttChannelFormats": [
                         {

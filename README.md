@@ -17,9 +17,9 @@ The application can be run on mulitple architectures, and is controlled by condi
 
 Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
 
-- The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust to the chipname configured in the specific `<chipname>.code-workspace` file.
-- Edit the `Cargo.toml` file, and update all locations marked with a **// CONFIGURE:** comment. These specify the `PID:VID` values for a specific USB target, and are required to simplify testing when multiple boards are connected to the same host.
-- Open the appropriate workspace file with 'Open Workspace from File ...', and you should be ready to debug.
+- Edit the applicable `<chipname>.code-workspace` file, and adjust the locations marked with a **// CONFIGURE:** comment.
+- The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust to the values configured in the `<chipname>.code-workspace` file.
+- Open the applicable workspace file with 'Open Workspace from File ...', and you should be ready to debug.
 
 ## Adding support for new chips
 

@@ -5,12 +5,13 @@
         }
     ],
     "settings": {
-        "rust-analyzer.checkOnSave.command": "clippy",
-        "rust-analyzer.cargo.target": "thumbv6m-none-eabi", // CONFIGURE: Replace target identity
+        "probe-rs-chipname": "RP2040", // CONFIGURE: Replace target feature
         "rust-analyzer.cargo.features": [
             "RP2040", // CONFIGURE: Replace target feature
-            "cafe","4005" // CONFIGURE: Replace target VID:PID for your probe
         ],
+        "probe-rs-vid-pid": "cafe:4005", // CONFIGURE: Replace with your probe's VID:PID
+        "rust-analyzer.checkOnSave.command": "clippy",
+        "rust-analyzer.cargo.target": "thumbv6m-none-eabi", // CONFIGURE: Replace target identity
         "editor.formatOnSave": true
     }
 }
