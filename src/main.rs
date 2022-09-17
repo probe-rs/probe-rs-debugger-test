@@ -11,14 +11,6 @@ use core::usize;
 use heapless::Vec;
 use rtt_target::{rprintln, rtt_init, set_print_channel};
 
-#[cfg(any(feature = "STM32H745ZITx", feature = "nRF52833_xxAA"))]
-use cortex_m::asm;
-
-#[cfg(any(
-    feature = "STM32H745ZITx",
-    feature = "RP2040",
-    feature = "nRF52833_xxAA"
-))]
 #[cfg(any(
     feature = "STM32H745ZITx",
     feature = "RP2040",
@@ -38,10 +30,23 @@ use nrf52833_hal::{
 };
 
 #[cfg(feature = "esp32c3")]
-use esp32c3_hal::{gpio::IO, pac::Peripherals, prelude::*, Delay, RtcCntl, Timer};
+use esp32c3_hal::{
+    clock::ClockControl,
+    pac::Peripherals,
+    prelude::*,
+    pulse_control::ClockSource,
+    timer::TimerGroup,
+    utils::{smartLedAdapter, SmartLedsAdapter},
+    Delay, PulseControl, Rtc, IO,
+};
 #[cfg(feature = "esp32c3")]
 use panic_halt as _;
-// #[cfg(feature = "esp32c3")]
+#[cfg(feature = "esp32c3")]
+use smart_leds::{
+    brightness, gamma,
+    hsv::{hsv2rgb, Hsv},
+    SmartLedsWrite,
+};
 // use riscv_atomic_emulation_trap as _;
 #[cfg(feature = "esp32c3")]
 use riscv_rt::entry;
@@ -55,8 +60,6 @@ use bsp::hal::{
 };
 #[cfg(feature = "RP2040")]
 use embedded_hal::digital::v2::ToggleableOutputPin;
-#[cfg(feature = "RP2040")]
-use embedded_time::fixed_point::FixedPoint;
 #[cfg(feature = "RP2040")]
 use rp_pico as bsp;
 
@@ -191,30 +194,44 @@ enum Enum<T: TraitWithAssocType> {
     Variant2(T::Type, T),
 }
 
-fn assoc_struct<T: TraitWithAssocType>(arg: Struct<T>) {}
-
-#[inline(always)]
-fn assoc_local<T: TraitWithAssocType>(x: T) {
-    let inferred = x.get_value();
-    let explicitly: T::Type = x.get_value();
+fn assoc_struct<T: TraitWithAssocType>(arg: Struct<T>) -> Struct<T> {
+    arg
 }
 
-fn assoc_arg<T: TraitWithAssocType>(arg: T::Type) {}
+#[inline(always)]
+fn assoc_local<T: TraitWithAssocType>(x: T) -> T::Type {
+    let inferred = x.get_value();
+    let explicitly: T::Type = x.get_value();
+    inferred
+}
+
+fn assoc_arg<T: TraitWithAssocType>(arg: T::Type) -> T::Type {
+    arg
+}
 
 fn assoc_return_value<T: TraitWithAssocType>(arg: T) -> T::Type {
     arg.get_value()
 }
 
-fn assoc_tuple<T: TraitWithAssocType>(arg: (T, T::Type)) {}
+fn assoc_tuple<T: TraitWithAssocType>(arg: (T, T::Type)) -> (T, T::Type) {
+    arg
+}
 
-fn assoc_enum<T: TraitWithAssocType>(arg: Enum<T>) {
+fn assoc_enum<T: TraitWithAssocType>(arg: Enum<T>) -> Enum<T> {
     match arg {
-        Enum::Variant1(a, b) => {}
-        Enum::Variant2(a, b) => {}
+        Enum::Variant1(a, b) => Enum::Variant2(b, a),
+        Enum::Variant2(a, b) => Enum::Variant1(b, a),
     }
 }
 
-fn create_short_lived(copy_me_from: &mut ComplexStruct) -> ComplexStruct {
+#[inline(never)]
+fn create_complex_struct() -> ComplexStruct {
+    rprintln!("Creating a new complex struct");
+    ComplexStruct { x: 10, y: 8, z: 4 }
+}
+
+#[inline(never)]
+fn create_short_lived(copy_me_from: ComplexStruct) -> ComplexStruct {
     let mut change_me = copy_me_from;
     change_me.x *= 2;
     rprintln!(
@@ -274,8 +291,6 @@ fn main() -> ! {
     );
     let second_case_of_struct_variants = consume_enum_parameter(first_case_of_struct_variants);
 
-    drop(second_case_of_struct_variants);
-
     let struct_with_one_variant = Some(TupleOfComplexStruct(
         ComplexStruct {
             x: 24,
@@ -289,8 +304,9 @@ fn main() -> ! {
         },
     ));
 
-    let mut long_lived = ComplexStruct { x: 10, y: 8, z: 4 };
-    let short_lived = create_short_lived(&mut long_lived);
+    let long_lived = ComplexStruct { x: 10, y: 8, z: 4 };
+    // The next line has two step-in targets. The first is the `create_complex_struct` function. The second is the `create_short_lived` function.
+    let short_lived = create_short_lived(create_complex_struct());
     let a1 = assoc_struct(Struct { b: -1, b1: 0 });
     let a2 = assoc_local(1);
     let a3 = assoc_arg::<i32>(2);
@@ -308,8 +324,7 @@ fn main() -> ! {
     heapless_vec.push(3).ok();
     let mut loop_counter = Wrapping(0u8);
 
-    let rtt_channels = rtt_init! {
-        up: {
+    let rtt_channels = rtt_init! { up: {
             0: {
                 size: 1024
                 mode: BlockIfFull
@@ -327,28 +342,48 @@ fn main() -> ! {
     let mut binary_rtt_channel: rtt_target::UpChannel = rtt_channels.up.1;
 
     #[cfg(feature = "esp32c3")]
-    let (mut delay, mut led_pin) = {
+    let (mut color_delay, mut led, mut color, mut data) = {
         let peripherals = Peripherals::take().unwrap();
+        let mut system = peripherals.SYSTEM.split();
+        let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
         // Disable the watchdog timers. For the ESP32-C3, this includes the Super WDT,
         // the RTC WDT, and the TIMG WDTs.
-        let mut rtc_cntl = RtcCntl::new(peripherals.RTC_CNTL);
-        let mut timer0 = Timer::new(peripherals.TIMG0);
-        let mut timer1 = Timer::new(peripherals.TIMG1);
-
-        rtc_cntl.set_super_wdt_enable(false);
-        rtc_cntl.set_wdt_enable(false);
-        timer0.disable();
-        timer1.disable();
-
+        let mut rtc = Rtc::new(peripherals.RTC_CNTL);
+        let mut timer0 = TimerGroup::new(peripherals.TIMG0, &clocks);
         let io = IO::new(peripherals.GPIO, peripherals.IO_MUX);
 
-        //TODO: The LED on gpio8 is "addressable" and won't flash with a simple on-off. The code in the main loop works, but doesn't flash the LED.
+        rtc.rwdt.disable();
+        timer0.wdt.disable();
 
-        (
-            Delay::new(peripherals.SYSTIMER),
-            io.pins.gpio8.into_push_pull_output(),
+        //This is more complex than other boards because of the LED installed on this board.
+        // Configure RMT peripheral globally
+        let pulse = PulseControl::new(
+            peripherals.RMT,
+            &mut system.peripheral_clock_control,
+            ClockSource::APB,
+            0,
+            0,
+            0,
         )
+        .unwrap();
+
+        // We use one of the RMT channels to instantiate a `SmartLedsAdapter` which can
+        // be used directly with all `smart_led` implementations
+        let led = <smartLedAdapter!(1)>::new(pulse.channel1, io.pins.gpio8);
+
+        // Initialize the Delay peripheral, and use it to toggle the LED state in a
+        // loop.
+        let delay = Delay::new(&clocks);
+
+        let color = Hsv {
+            hue: 255,
+            sat: 255,
+            val: 255,
+        };
+        let data = [hsv2rgb(color)];
+
+        (delay, led, color, data)
     };
 
     #[cfg(feature = "RP2040")]
@@ -379,7 +414,7 @@ fn main() -> ! {
         );
 
         (
-            cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().integer()),
+            cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz()),
             pins.led.into_readable_output(),
         )
     };
@@ -401,7 +436,16 @@ fn main() -> ! {
                 .degrade(),
         )
     };
-
+    unsafe {
+        #[cfg(any(
+            feature = "STM32H745ZITx",
+            feature = "RP2040",
+            feature = "nRF52833_xxAA"
+        ))]
+        core::arch::asm!("bkpt");
+        #[cfg(feature = "esp32c3")]
+        core::arch::asm!("ebreak");
+    }
     test_deep_stack(0);
     loop {
         loop_counter += Wrapping(1u8);
@@ -423,16 +467,34 @@ fn main() -> ! {
             delay.delay_ms(250_u32);
         }
 
-        #[cfg(any(feature = "RP2040", feature = "esp32c3"))]
+        #[cfg(feature = "RP2040")]
         {
             led_pin.toggle().ok();
             delay.delay_ms(250_u32);
         }
 
-        #[cfg(any(feature = "STM32H745ZITx", feature = "nRF52833_xxAA"))]
-        asm::delay(10_000_000);
+        #[cfg(feature = "esp32c3")]
+        {
+            color.hue = loop_counter.0; // Iterate over the rainbow!
+
+            // Convert from the HSV color space (where we can easily transition from one
+            // color to the other) to the RGB color space that we can then send to the LED
+            data = [hsv2rgb(color)];
+            // When sending to the LED, we do a gamma correction first (see smart_leds
+            // documentation for details) and then limit the brightness to 10 out of 255 so
+            // that the output it's not too bright.
+            match led.write(brightness(gamma(data.iter().cloned()), 10)) {
+                Ok(_) => (),
+                Err(e) => rprintln!("Error: {:?}", e),
+            }
+            color_delay.delay_ms(250u8);
+        }
+
+        #[cfg(feature = "STM32H745ZITx")]
+        cortex_m::asm::delay(10_000_000);
     }
 
+    #[inline(never)]
     fn test_deep_stack(stack_depth: usize) {
         let internal_depth_measure = stack_depth + 1;
         rprintln!(
@@ -441,6 +503,7 @@ fn main() -> ! {
         );
         if internal_depth_measure <= 35 {
             test_deep_stack(internal_depth_measure);
+            rprintln!("Returning from call # {} ", internal_depth_measure);
         } else {
             rprintln!("Dropping out of the deep recursive stack test");
         }

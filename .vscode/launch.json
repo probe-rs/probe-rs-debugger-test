@@ -6,20 +6,25 @@
             "type": "probe-rs-debug",
             "request": "launch",
             "name": "probe-rs-debugger",
-            // "server": "127.0.0.1:50001", // For connecting to an existing probe-rs-debugger process
-            "chip": "${config:rust-analyzer.cargo.features}",
+            // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
+            "chip": "${config:probe-rs-chipname}", 
             "cwd": "${workspaceFolder}",
+            "probe": "${config:probe-rs-vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
             "coreConfigs": [
                 {
                     "coreIndex": 0,
                     "programBinary": "${workspaceFolder}/target/${config:rust-analyzer.cargo.target}/debug/probe-rs-debugger-test",
-                    "svdFile": "svd_files/${config:rust-analyzer.cargo.features}.svd",
+                    "svdFile": "svd_files/${config:probe-rs-chipname}.svd",
                     "rttEnabled": true,
                     "rttChannelFormats": [
                         {
                             "dataFormat": "String",
                             "channelNumber": 0,
-                            "showTimestamps": true
+                            "showTimestamps": true,
+                        },
+                        {
+                            "dataFormat": "BinaryLE",
+                            "channelNumber": 1,
                         }
                     ],
                 },
@@ -31,8 +36,8 @@
                 "haltAfterReset": false,
             },
             "connectUnderReset": false,
-            "consoleLogLevel": "Info",
+            "consoleLogLevel": "Error",
             "speed": 2000 // CONFIGURE: Optionally update USB speed
-        },
+        }
     ]
 }
