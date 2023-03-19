@@ -1,7 +1,7 @@
 [package]
 name = "probe-rs-debugger-test"
 description = "Test the probe-rs-debugger (and optionally VSCode extension) against various chips/boards"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Jack Noppe <noppej@hotmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -9,55 +9,84 @@ autobins = false
 autoexamples = false
 autotests = false
 autobenches = false
+resolver = "2"
+
+[lib]
+name = "common_testing_code"
+path = "src/common_testing_code.rs"
 
 [[bin]]
-name = "probe-rs-debugger-test"
-path = "src/main.rs"
+name = "esp32c3"
+path = "src/riscv32imac-unknown-none-elf/esp32c3.rs"
+required-features = ["esp32c3"]
+
+[[bin]]
+name = "STM32C031C6Tx"
+path = "src/thumbv6m-none-eabi/STM32C031C6Tx.rs"
+required-features = ["STM32C031C6Tx"]
+
+[[bin]]
+name = "STM32H745ZITx"
+path = "src/thumbv7em-none-eabihf/STM32H745ZITx.rs"
+required-features = ["STM32H745ZITx"]
+
+[[bin]]
+name = "nRF52833_xxAA"
+path = "src/thumbv7em-none-eabihf/nRF52833_xxAA.rs"
+required-features = ["nRF52833_xxAA"]
+
+[[bin]]
+name = "RP2040"
+path = "src/thumbv6m-none-eabi/RP2040.rs"
+required-features = ["RP2040"]
 
 [features]
-STM32H745ZITx = []
-nRF52833_xxAA = ["nrf52833-hal"]
-RP2040 = ["embedded-time", "rp-pico", "embedded-hal"]
-esp32c3 = ["esp32c3-hal"]
-
-
-[target.thumbv6m-none-eabi.dependencies]
-cortex-m = { version = "0.7.6" }
-cortex-m-rt = { version = "0.7.1" }
-rtt-target = { version = "0.3.1", features = ["cortex-m"] }
-panic-probe = { version = "0.3", features = ["print-rtt"] }
-
-[target.thumbv7em-none-eabihf.dependencies]
-cortex-m = { version = "0.7.6" }
-cortex-m-rt = { version = "0.7.1" }
-rtt-target = { version = "0.3.1", features = ["cortex-m"] }
-panic-probe = { version = "0.3", features = ["print-rtt"] }
-
-# Uncomment this patch to access unreleased (from 0.7.1) feature where prebuilt asm is replaced with inlined asm.
-# [patch.crates-io]
-# cortex-m-rt = { git = "https://github.com/rust-embedded/cortex-m", branch = "master" }
-
-[target.riscv32imac-unknown-none-elf.dependencies]
-riscv = { git = "https://github.com/rust-embedded/riscv" }
-riscv-rt = { version = "0.9.0" }
-panic-halt = { version = "0.2.0" }
-rtt-target = { version = "0.3.1", features = ["riscv"] }
-smart-leds = { version = "0.3" }
+esp32c3 = ["riscv", "esp32c3-hal", "smart-leds"]
+STM32C031C6Tx = ["cortex-m", "cortex-m-rt"]
+STM32H745ZITx = ["cortex-m", "cortex-m-rt"]
+nRF52833_xxAA = ["cortex-m", "cortex-m-rt", "nrf52833-hal"]
+RP2040 = [
+    "cortex-m-mc",
+    "cortex-m-rt",
+    "embedded-time",
+    "rp-pico",
+    "embedded-hal",
+]
 
 [dependencies]
 # Dependencies shared between different hardware
+rtt-target = { version = "0.4" }
 heapless = { version = "0.7.9", default-features = false }
+
 # Feature specific dependencies
-esp32c3-hal = { version = "0.2.0", optional = true, features = [
+embedded-time = { version = "0.12.1", optional = true }
+embedded-hal = { version = "0.2.7", features = ["unproven"], optional = true }
+embedded-io = { version = "0.4.0", features = ["async"], optional = true }
+
+nrf52833-hal = { version = "0.15.1", features = ["rt"], optional = true }
+
+rp-pico = { version = "0.7.0", optional = true }
+
+cortex-m = { version = "0.7.7", features = [
+    "critical-section-single-core",
+    "inline-asm",
+], optional = true }
+cortex-m-mc = { version = "0.7.7", optional = true, package = "cortex-m" }
+cortex-m-rt = { version = "0.7.3", optional = true }
+
+esp32c3-hal = { version = "0.7.0", features = [
     "direct-boot",
     "smartled",
-] }
-embedded-hal = { version = "0.2.7", features = ["unproven"], optional = true }
-embedded-time = { version = "0.12.1", optional = true }
-nrf52833-hal = { version = "0.15.1", features = ["rt"], optional = true }
-rp-pico = { version = "0.5.0", optional = true }
+], optional = true }
+riscv = { version = "0.10.1", optional = true }
+smart-leds = { version = "0.3.0", optional = true }
+
 
 [profile.dev]
 codegen-units = 1 # better optimizations and easier ELF to debug the debugger
 debug = true      # default is `false`; using `true` is also OK as the symbols reside on the host platform, not the target
-lto = false       # better optimizations
+lto = false       # Link Time Optimizations
+
+[profile.release]
+# debug = true # default is `false`; using `true` is also OK as the symbols reside on the host platform, not the target
+# lto = false       # Link Time Optimizations

@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    // CONFIGURE: Add or replace with your probe's VID:PID and chip name - will be referenced from `launch.json`
+    // TODO: automatically resolve these in `launch.json` - probably as input variables to a a script that automates the tests.
+    "vid-pid.RP2040": "cafe:4005", // CONFIGURE: Omit or Replace with your probe's VID:PID
+    "vid-pid.stm32h745": "0483:3754", // CONFIGURE: Replace with your probe's VID:PID
+    "vid-pid.stm32c031c6": "0483:3754", // CONFIGURE: Replace with your probe's VID:PID
+    "vid-pid.esp32c3": "303a:1001", // CONFIGURE: Omit, or replace with your probe's VID:PID
+    "vid-pid.nrf52833_xxAA": "0d28:0204", // CONFIGURE: Omit or Replace with your probe's VID:PID
+
+    // The following are convenience settings for code editing.
+    "rust-analyzer.checkOnSave": true,
+    "rust-analyzer.check.overrideCommand": [
+      "cargo",
+      "clippy",
+      "--message-format",
+      "json-diagnostic-rendered-ansi"
+    ]
+  }
+}

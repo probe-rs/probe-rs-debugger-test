@@ -1,43 +1,79 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "preLaunchTask": "${defaultBuildTask}",
+      "type": "probe-rs-debug",
+      "request": "launch",
+      "name": "probe-rs-debugger",
+      "chip": "${fileBasenameNoExtension}",
+      "cwd": "${workspaceFolder}",
+      // "probe": "${config:vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
+      "coreConfigs": [
         {
-            "preLaunchTask": "${defaultBuildTask}",
-            "type": "probe-rs-debug",
-            "request": "launch",
-            "name": "probe-rs-debugger",
-            // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
-            "chip": "${config:probe-rs-chipname}", 
-            "cwd": "${workspaceFolder}",
-            "probe": "${config:probe-rs-vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
-            "coreConfigs": [
-                {
-                    "coreIndex": 0,
-                    "programBinary": "${workspaceFolder}/target/${config:rust-analyzer.cargo.target}/debug/probe-rs-debugger-test",
-                    "svdFile": "svd_files/${config:probe-rs-chipname}.svd",
-                    "rttEnabled": true,
-                    "rttChannelFormats": [
-                        {
-                            "dataFormat": "String",
-                            "channelNumber": 0,
-                            "showTimestamps": true,
-                        },
-                        {
-                            "dataFormat": "BinaryLE",
-                            "channelNumber": 1,
-                        }
-                    ],
-                },
-            ],
-            "runtimeExecutable": "probe-rs-debugger",
-            "flashingConfig": {
-                "flashingEnabled": true,
-                "resetAfterFlashing": true,
-                "haltAfterReset": false,
+          "coreIndex": 0,
+          "programBinary": "${workspaceFolder}/target/${fileDirnameBasename}/debug/${fileBasenameNoExtension}",
+          "svdFile": "svd_files/${fileBasenameNoExtension}.svd",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            {
+              "dataFormat": "String",
+              "channelNumber": 0,
+              "showTimestamps": false
             },
-            "connectUnderReset": false,
-            "consoleLogLevel": "Error",
-            "speed": 2000 // CONFIGURE: Optionally update USB speed
+            {
+              "dataFormat": "BinaryLE",
+              "channelNumber": 1
+            }
+          ]
         }
-    ]
+      ],
+      "flashingConfig": {
+        "flashingEnabled": true,
+        "haltAfterReset": false
+      },
+      // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
+      "consoleLogLevel": "Info",
+      // "env": {
+      // "RUST_LOG": "trace"
+      // "DEFMT_LOG": "debug"
+      // },
+      "speed": 4000 // CONFIGURE: Optionally update USB speed
+    },
+
+    {
+      "type": "probe-rs-debug",
+      "request": "attach",
+      "name": "ATTACH probe-rs-debugger",
+      "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
+      "chip": "${fileBasenameNoExtension}",
+      "cwd": "${workspaceFolder}",
+      "probe": "${config:probe-rs-vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
+      "coreConfigs": [
+        {
+          "coreIndex": 0,
+          "programBinary": "${workspaceFolder}/target/${config:rust-analyzer.cargo.target}/debug/${fileBasenameNoExtension}",
+          "svdFile": "svd_files/${fileBasenameNoExtension}.svd",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            {
+              "dataFormat": "String",
+              "channelNumber": 0,
+              "showTimestamps": false
+            },
+            {
+              "dataFormat": "BinaryLE",
+              "channelNumber": 1
+            }
+          ]
+        }
+      ],
+      "consoleLogLevel": "Console",
+      // "env": {
+      //     "RUST_LOG": "trace",
+      //     "DEFMT_LOG": "debug"
+      // },
+      "speed": 4000 // CONFIGURE: Optionally update USB speed
+    }
+  ]
 }
