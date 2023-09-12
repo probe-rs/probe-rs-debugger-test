@@ -8,8 +8,6 @@
 #![allow(unused_assignments)]
 #![feature(core_intrinsics)]
 
-use core::num::Wrapping;
-
 // This section contains the declarations that is common to all the tests, and is not specific to any one chip/board.
 use common_testing_code::*;
 use rtt_target::rprintln;
@@ -25,11 +23,6 @@ fn SysTick() {
     *COUNT += 1;
 
     if *COUNT == 5 {
-        // Cause a hardfault, by reading from an invalid address.
-        // unsafe {
-        //     core::ptr::read_volatile(0x3FFF_FFFE as *const u32);
-        // }
-
         // If `UsageFault` is enabled, we disable that first, since otherwise `udf` will cause that
         // exception instead of `HardFault`.
         const SHCSR: *mut u32 = 0xE000ED24usize as _;
@@ -86,9 +79,6 @@ fn main() -> ! {
         // Common testing code.
         shared_loop_processing(&mut binary_rtt_channel, &mut loop_counter);
 
-        if loop_counter.eq(&Wrapping(10)) {
-            // panic!("Loop counter exceeded 10");
-        }
         // Board/Chip specific code.
         cortex_m::asm::delay(1_000_001);
     }

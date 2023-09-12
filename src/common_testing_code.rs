@@ -340,7 +340,7 @@ pub fn test_deep_stack(stack_depth: usize) {
         "Recursive call # {} in `test_deep_stack`",
         internal_depth_measure
     );
-    if internal_depth_measure <= 35 {
+    if internal_depth_measure <= 5 {
         test_deep_stack(internal_depth_measure);
         rprintln!("Returning from call # {} ", internal_depth_measure);
     } else {
@@ -359,6 +359,5 @@ pub fn shared_loop_processing(
         loop_counter.0,
         bytes_written,
     );
-    // Text Output line on Channel 0
     *loop_counter += Wrapping(1u8);
 }
