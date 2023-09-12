@@ -1,5 +1,3 @@
-//! This build script copies the `Core0.x` and "Core1.x" file from the crate /src into
-//! a directory where the linker can always find it at build time.
 #![allow(unused_imports)]
 use std::env;
 use std::fs::File;

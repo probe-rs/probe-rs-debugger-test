@@ -12,7 +12,7 @@ use common_testing_code::*;
 use rtt_target::rprintln;
 
 // Board/Chip specific code.
-use cortex_m_rt::entry;
+use cortex_m_rt::{entry, exception, ExceptionFrame};
 
 use bsp::hal::{
     clocks::{init_clocks_and_plls, Clock},
@@ -23,16 +23,25 @@ use bsp::hal::{
 use embedded_hal::digital::v2::ToggleableOutputPin;
 use rp_pico as bsp;
 
-#[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
-    rprintln!("Panic: {:?}", info);
-    loop {
-        unsafe {
-            core::arch::asm!("bkpt");
-        }
-        rprintln!("In a panic loop, stepped past the breakpoint");
+#[exception]
+unsafe fn HardFault(ef: &ExceptionFrame) -> ! {
+    rprintln!("HardFault at {:#?}", ef);
+    unsafe {
+        core::arch::asm!("bkpt");
     }
+    loop {}
 }
+
+// #[panic_handler]
+// fn panic(info: &core::panic::PanicInfo) -> ! {
+//     rprintln!("Panic: {:?}", info);
+//     loop {
+//         unsafe {
+//             core::arch::asm!("bkpt");
+//         }
+//         rprintln!("In a panic loop, stepped past the breakpoint");
+//     }
+// }
 
 #[entry]
 fn main() -> ! {
@@ -66,7 +75,7 @@ fn main() -> ! {
         &mut pac.RESETS,
     );
     let mut delay = cortex_m_mc::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
-    let mut led_pin = pins.led.into_readable_output();
+    let mut led_pin = pins.led.into_push_pull_output();
 
     loop {
         // Common testing code.
@@ -74,6 +83,22 @@ fn main() -> ! {
 
         // Board/Chip specific code.
         led_pin.toggle().ok();
-        delay.delay_ms(250_u32);
+        delay.delay_ms(1000_u32);
+
+        // Cause a hardfault, by reading from an invalid address.
+        unsafe {
+            core::ptr::read_volatile(0x3FFF_FFFE as *const u32);
+        }
+    }
+}
+
+use core::panic::PanicInfo;
+
+#[inline(never)]
+#[panic_handler]
+fn panic(_info: &PanicInfo) -> ! {
+    loop {
+        rtt_target::rprintln!("going to udf");
+        cortex_m_mc::asm::udf();
     }
 }

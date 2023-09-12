@@ -6,13 +6,52 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 #![allow(unused_assignments)]
+#![feature(core_intrinsics)]
+
+use core::num::Wrapping;
 
 // This section contains the declarations that is common to all the tests, and is not specific to any one chip/board.
 use common_testing_code::*;
 use rtt_target::rprintln;
 
 // Board/Chip specific code.
-use cortex_m_rt::entry;
+use cortex_m::peripheral::syst::SystClkSource;
+use cortex_m_rt::{entry, exception, ExceptionFrame};
+
+#[exception]
+fn SysTick() {
+    static mut COUNT: u32 = 0;
+
+    *COUNT += 1;
+
+    if *COUNT == 5 {
+        // Cause a hardfault, by reading from an invalid address.
+        // unsafe {
+        //     core::ptr::read_volatile(0x3FFF_FFFE as *const u32);
+        // }
+
+        // If `UsageFault` is enabled, we disable that first, since otherwise `udf` will cause that
+        // exception instead of `HardFault`.
+        const SHCSR: *mut u32 = 0xE000ED24usize as _;
+        const USGFAULTENA: usize = 18;
+        unsafe {
+            let mut shcsr = core::ptr::read_volatile(SHCSR);
+            shcsr &= !(1 << USGFAULTENA);
+            core::ptr::write_volatile(SHCSR, shcsr);
+        }
+        // Cause a UDF, by reading executing an invalid instruction.
+        core::intrinsics::abort()
+    }
+}
+
+#[exception]
+unsafe fn HardFault(ef: &ExceptionFrame) -> ! {
+    rprintln!("HardFault at {:#?}", ef);
+    unsafe {
+        core::arch::asm!("bkpt");
+    }
+    loop {}
+}
 
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
@@ -32,13 +71,25 @@ fn main() -> ! {
     test_deep_stack(0);
 
     // Board/Chip specific code.
-    // TODO: setup a LED to flash.
+    let p = cortex_m::Peripherals::take().unwrap();
+    let mut syst = p.SYST;
+
+    // configures the system timer to trigger a SysTick exception every second
+    syst.set_clock_source(SystClkSource::Core);
+    // this is configured for the STM32H745 which has a default CPU clock of 400 MHz
+    syst.set_reload(400_000_000);
+    syst.clear_current();
+    syst.enable_counter();
+    syst.enable_interrupt();
 
     loop {
         // Common testing code.
         shared_loop_processing(&mut binary_rtt_channel, &mut loop_counter);
 
+        if loop_counter.eq(&Wrapping(10)) {
+            // panic!("Loop counter exceeded 10");
+        }
         // Board/Chip specific code.
-        cortex_m::asm::delay(1_000_000);
+        cortex_m::asm::delay(1_000_001);
     }
 }
