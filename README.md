@@ -5,21 +5,29 @@ The application in this repo are designed to allow consistent testing of `probe-
 The application can be run on mulitple architectures, and is controlled by conditional compile features, which are keyed on the chip name as reported by `probe-rs-debugger list-chips`. The following chips / features are pre-configured for use:
 
 - `STM32H745ZITx`
-  - ARM Cortex-M7 core on a ST Nucleo H745ZI-Q board
+  - ARM Cortex-M7 / Armv7-M core on a ST Nucleo H745ZI-Q board
+  - TODO: Create multi-core debug examples.
+  - TODO: Add `rtic` async to example.
 - `STM32C031C6Tx`
-  - ARM Cortex-M6 core on a STM32C0316-DK board
+  - ARM Cortex-M0 / Armv6-M core on a STM32C0316-DK board
 - `nRF52833_xxAA`
-  - ARM Cortex-M4 on a Micro:Bit v2 board
+  - ARM Cortex-M4 / Armv6-M on a Micro:Bit v2 board
 - `esp32c3`
-  - RISCV on an Espressif ESP32-C3 board
+  - RISC-V on an Espressif ESP32-C3 board
+  - TODO: Requires manual editing of 'launch.json' to enable EDF boot loader.
 - `RP2040`
-  - ARM Cortex-M0 on Raspberry PICO RP2040, that uses a second PICO as a probe.
+  - ARM Cortex-M0 / Armv6-M on Raspberry PICO RP2040, that uses a second PICO as a probe.
+  - TODO: Add `embassy` async to example.
+- TODO: `STM32U5A9` as a ARM Cortex-M33 / Armv8-M architecute.
+- TODO: Armv7-A
+- TODO: Armv8-A
 
 ## Usage notes:
 
 Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
 
 - The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust behaviour based on the active source file in the editor. The configuration uses VSCode variables referencing both the file name and the parent folder name, to determine the correct values in the configuration to use.
+- The `.vscode/launch.json` prompts for levels of optimization required. The intention is to simplify the creation of various binaries for automated testing of `probe-rs` debug api.
 
 ## Adding support for new chips
 

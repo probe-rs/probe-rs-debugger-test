@@ -45,7 +45,7 @@ struct ComplexStruct {
     z: i16,
 }
 
-#[derive(core::cmp::PartialEq)]
+#[derive(core::cmp::PartialEq, Debug)]
 enum SimpleEnum {
     One,
     Two,
@@ -201,15 +201,17 @@ fn consume_enum_parameter(complex_enum: ComplexEnum) -> ComplexEnum {
 
 #[inline(never)]
 pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
-    static mut LOCAL_STATIC: &str = "A 'local' to main() static variable";
+    let int8_minus_twenty_three: i8 = -23;
+    static mut LOCAL_STATIC: &str =
+        "A 'local' to main() static variable ...will be optimized out if not used in the code.";
     let local_reference_to_global_const = GLOBAL_CONSTANT;
     let local_reference_to_global_static = unsafe { GLOBAL_STATIC };
     let local_reference_to_global_static_struct = unsafe { &REGULAR_STRUCT };
     let ghosted_variable = 0_usize;
     let ghosted_variable = "New value and type for a different name";
-    let int8_twenty_three: i8 = 26;
+    let int8_twenty_six: i8 = 26;
     let int128: i128 = -196710231994021419720322;
-    let u_int128: u128 = 196710231994021419720322;
+    let u_int128: u128 = int128 as u128;
     let float64: f64 = 56.7 / 32.2; //1.760869565217391
     let float64_ptr = &float64;
     let emoji = '💩';
@@ -315,6 +317,19 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
         }
     };
     set_print_channel(rtt_channels.up.0);
+    rprintln!("Forcing use of : {:?}", simple_enum_pointer);
+    unsafe {
+        rprintln!("Forcing use of :{}", LOCAL_STATIC);
+    }
+    // We force a software breakpoint here, so that our tests can rely on the target state being stopped exactly here.
+    #[cfg(not(feature = "esp32c3"))]
+    unsafe {
+        core::arch::asm!("bkpt");
+    }
+    #[cfg(feature = "esp32c3")]
+    unsafe {
+        core::arch::asm!("ebreak");
+    }
     (loop_counter, rtt_channels.up.1)
 }
 
@@ -325,7 +340,7 @@ pub fn test_deep_stack(stack_depth: usize) {
         "Recursive call # {} in `test_deep_stack`",
         internal_depth_measure
     );
-    if internal_depth_measure <= 35 {
+    if internal_depth_measure <= 5 {
         test_deep_stack(internal_depth_measure);
         rprintln!("Returning from call # {} ", internal_depth_measure);
     } else {
@@ -344,6 +359,5 @@ pub fn shared_loop_processing(
         loop_counter.0,
         bytes_written,
     );
-    // Text Output line on Channel 0
     *loop_counter += Wrapping(1u8);
 }

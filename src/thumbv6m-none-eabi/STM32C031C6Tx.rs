@@ -32,7 +32,6 @@ fn main() -> ! {
     test_deep_stack(0);
 
     // Board/Chip specific code.
-    // TODO: setup a LED to flash.
 
     loop {
         // Common testing code.

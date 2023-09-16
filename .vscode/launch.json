@@ -2,17 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "preLaunchTask": "${defaultBuildTask}",
+      "preLaunchTask": "${input:profile}",
       "type": "probe-rs-debug",
       "request": "launch",
       "name": "probe-rs-debugger",
       "chip": "${fileBasenameNoExtension}",
       "cwd": "${workspaceFolder}",
+      // "runtimeExecutable": "probe-rs", // OPTIONAL: If you want to use a specific version/install location of probe-rs.
+      // "runtimeArgs": ["debug"], // OPTIONAL: Add additional arguments to the probe-rs command.
       // "probe": "${config:vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
       "coreConfigs": [
         {
           "coreIndex": 0,
-          "programBinary": "${workspaceFolder}/target/${fileDirnameBasename}/debug/${fileBasenameNoExtension}",
+          "programBinary": "${workspaceFolder}/target/${fileDirnameBasename}/${input:profile}/${fileBasenameNoExtension}",
           "svdFile": "svd_files/${fileBasenameNoExtension}.svd",
           "rttEnabled": true,
           "rttChannelFormats": [
@@ -31,49 +33,40 @@
       "flashingConfig": {
         "flashingEnabled": true,
         "haltAfterReset": false
+        // , // OPTIONAL: Use ESP IDF Bootloader
+        // "formatOptions": {
+        //   "format": "idf"
+        // }
       },
       // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
-      "consoleLogLevel": "Info",
+      // "consoleLogLevel": "Debug",
       // "env": {
       // "RUST_LOG": "trace"
       // "DEFMT_LOG": "debug"
       // },
       "speed": 4000 // CONFIGURE: Optionally update USB speed
-    },
-
+    }
+  ],
+  "inputs": [
     {
-      "type": "probe-rs-debug",
-      "request": "attach",
-      "name": "ATTACH probe-rs-debugger",
-      "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
-      "chip": "${fileBasenameNoExtension}",
-      "cwd": "${workspaceFolder}",
-      "probe": "${config:probe-rs-vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
-      "coreConfigs": [
+      "id": "profile",
+      "type": "pickString",
+      "description": "Please select a profile for level of optimization required.",
+      "options": [
         {
-          "coreIndex": 0,
-          "programBinary": "${workspaceFolder}/target/${config:rust-analyzer.cargo.target}/debug/${fileBasenameNoExtension}",
-          "svdFile": "svd_files/${fileBasenameNoExtension}.svd",
-          "rttEnabled": true,
-          "rttChannelFormats": [
-            {
-              "dataFormat": "String",
-              "channelNumber": 0,
-              "showTimestamps": false
-            },
-            {
-              "dataFormat": "BinaryLE",
-              "channelNumber": 1
-            }
-          ]
+          "label": "Debug Info + LTO=off + opt-level = 0",
+          "value": "debug-no-opt"
+        },
+        {
+          "label": "Debug Info + LTO=thin + opt-level = 1",
+          "value": "debug-lto-thin-opt-1"
+        },
+        {
+          "label": "Debug Info + LTO=fat + opt-level = 2",
+          "value": "debug-lto-fat-opt-2"
         }
       ],
-      "consoleLogLevel": "Console",
-      // "env": {
-      //     "RUST_LOG": "trace",
-      //     "DEFMT_LOG": "debug"
-      // },
-      "speed": 4000 // CONFIGURE: Optionally update USB speed
+      "default": "debug-no-opt"
     }
   ]
 }
