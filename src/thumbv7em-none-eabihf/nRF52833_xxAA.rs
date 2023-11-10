@@ -49,7 +49,6 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 fn main() -> ! {
     // Common testing code.
     let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
-    test_deep_stack(0);
 
     // Board/Chip specific code.
     let pac = Peripherals::take().unwrap();

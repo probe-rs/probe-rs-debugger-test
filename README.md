@@ -24,10 +24,26 @@ The application can be run on mulitple architectures, and is controlled by condi
 
 ## Usage notes:
 
-Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
+1. Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
 
-- The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust behaviour based on the active source file in the editor. The configuration uses VSCode variables referencing both the file name and the parent folder name, to determine the correct values in the configuration to use.
-- The `.vscode/launch.json` prompts for levels of optimization required. The intention is to simplify the creation of various binaries for automated testing of `probe-rs` debug api.
+    - The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust behaviour based on the active source file in the editor. The configuration uses VSCode variables referencing both the file name and the parent folder name, to determine the correct values in the configuration to use.
+    - The `.vscode/launch.json` prompts for levels of optimization required. The intention is to simplify the creation of various binaries for automated testing of `probe-rs` debug api.
+
+2. Optional: Create coredump files that can be used in automated `probe-rs` debug tests.
+
+    - When launching the app in VSCode, choose the `debug-no-opt` launch profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
+    - Check the terminal window called "cargo-size", for:
+      - `.text` and note the value in the `addr` column, to be used as `<memory start address>` below.
+      - `Total` and note the value in the `size` column, to be used as `<memory size in bytes>` below`.
+    - Note the name of the chip used for this application, 
+      - e.g. `NRF52833_xxAA` and use it in the `<file path/name for coredump file to be created>` below.
+    - In the `DEBUG CONSOLE` window, type the following command and wait for it to complete (it takes a few minutes).
+      - `dump <memory start address> <memory size in bytes> <file path/name for coredump file to be created>`
+      - e.g. `dump 0x20000000 0x293b35 target/NRF52833_xxAA.coredump`
+    - This file can now be moved into the `probe-rs/probe-rs` repository, to be used as a test source. Please update the `probe-rs/tests/README.md` in that repository with appropriate information to ensure anyone can accurately recreate the coredump.
+      - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also.
+  
+
 
 ## Adding support for new chips
 
