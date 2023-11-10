@@ -38,7 +38,7 @@
         //   "format": "idf"
         // }
       },
-      // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
+      "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
       // "consoleLogLevel": "Debug",
       // "env": {
       // "RUST_LOG": "trace"
