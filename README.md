@@ -24,10 +24,25 @@ The application can be run on mulitple architectures, and is controlled by condi
 
 ## Usage notes:
 
-Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
+1. Use the **VSCode probe-rs-debug extension** for `probe-rs-debugger`
 
-- The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust behaviour based on the active source file in the editor. The configuration uses VSCode variables referencing both the file name and the parent folder name, to determine the correct values in the configuration to use.
-- The `.vscode/launch.json` prompts for levels of optimization required. The intention is to simplify the creation of various binaries for automated testing of `probe-rs` debug api.
+    - The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust behaviour based on the active source file in the editor. The configuration uses VSCode variables referencing both the file name and the parent folder name, to determine the correct values in the configuration to use.
+    - The `.vscode/launch.json` prompts for levels of optimization required. The intention is to simplify the creation of various binaries for automated testing of `probe-rs` debug api.
+
+2. Optional: Create coredump files that can be used in automated `probe-rs` debug tests.
+
+    - When launching the app in VSCode, choose the `debug-no-opt` launch profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
+    - The memory regions required in the coredump as follows:
+      - text: Check the `cargo-size` terminal window to see the memory locations and sizes of the `.rodata` location.
+      - data: Check the appropriate linker file for the region that corresponds to the `.data` secion of the binary, and use the memory location and size from the linker file.
+    - The current tests and `dump` commands are listed below, with the coredump filename based on the cargo bin name of each binary.
+      - Armv6-m:`dump 0x20000000 0x4000 0x1000b150 0x1b00 target/RP2040.coredump`
+      - Armv7-m:`dump 0x20000000 0x4000 0x4cf0 0x1070 target/NRF52833_xxAA.coredump`
+      - TODO: RISC-V32: `dump 0x3FC80000 0x60000 0x3c010020 0x2b88 target/RP2040.coredump`
+    - This file can now be moved into the `probe-rs/probe-rs` repository, to be used as a test source. Please update the `probe-rs/tests/README.md` in that repository with appropriate information to ensure anyone can accurately recreate the coredump.
+      - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also.
+  
+
 
 ## Adding support for new chips
 

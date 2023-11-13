@@ -321,15 +321,8 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
     unsafe {
         rprintln!("Forcing use of :{}", LOCAL_STATIC);
     }
-    // We force a software breakpoint here, so that our tests can rely on the target state being stopped exactly here.
-    #[cfg(not(feature = "esp32c3"))]
-    unsafe {
-        core::arch::asm!("bkpt");
-    }
-    #[cfg(feature = "esp32c3")]
-    unsafe {
-        core::arch::asm!("ebreak");
-    }
+    test_deep_stack(0);
+
     (loop_counter, rtt_channels.up.1)
 }
 
@@ -344,6 +337,15 @@ pub fn test_deep_stack(stack_depth: usize) {
         test_deep_stack(internal_depth_measure);
         rprintln!("Returning from call # {} ", internal_depth_measure);
     } else {
+        // We force a software breakpoint here, so that our tests can rely on the target state being stopped exactly here.
+        #[cfg(not(feature = "esp32c3"))]
+        unsafe {
+            core::arch::asm!("bkpt");
+        }
+        #[cfg(feature = "esp32c3")]
+        unsafe {
+            core::arch::asm!("ebreak");
+        }
         rprintln!("Dropping out of the deep recursive stack test");
     }
 }
