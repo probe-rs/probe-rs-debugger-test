@@ -32,12 +32,13 @@ The application can be run on mulitple architectures, and is controlled by condi
 2. Optional: Create coredump files that can be used in automated `probe-rs` debug tests.
 
     - When launching the app in VSCode, choose the `debug-no-opt` launch profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
-    - Check the appropriate linker file in `./linker_files` directory, for RAM start values and size, to be used as `<memory start address>` and `<memory size in bytes>` below`.
-    - Note the name of the chip used for this application, 
-      - e.g. `NRF52833_xxAA` and use it in the `<file path/name for coredump file to be created>` below.
-    - In the `DEBUG CONSOLE` window, type the following command and wait for it to complete (it takes a few minutes).
-      - `dump <memory start address> <memory size in bytes> <file path/name for coredump file to be created>`
-      - e.g. `dump 0x20000000 0x4000 target/nRF52833_xxAA.coredump`
+    - The memory regions required in the coredump as follows:
+      - text: Check the `cargo-size` terminal window to see the memory locations and sizes of the `.rodata` location.
+      - data: Check the appropriate linker file for the region that corresponds to the `.data` secion of the binary, and use the memory location and size from the linker file.
+    - The current tests and `dump` commands are listed below, with the coredump filename based on the cargo bin name of each binary.
+      - Armv6-m:`dump 0x20000000 0x4000 0x1000b150 0x1b00 target/RP2040.coredump`
+      - Armv7-m:`dump 0x20000000 0x4000 0x4cf0 0x1070 target/NRF52833_xxAA.coredump`
+      - TODO: RISC-V32: `dump 0x3FC80000 0x60000 0x3c010020 0x2b88 target/RP2040.coredump`
     - This file can now be moved into the `probe-rs/probe-rs` repository, to be used as a test source. Please update the `probe-rs/tests/README.md` in that repository with appropriate information to ensure anyone can accurately recreate the coredump.
       - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also.
   
