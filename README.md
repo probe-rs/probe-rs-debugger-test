@@ -38,7 +38,9 @@ The application can be run on mulitple architectures, and is controlled by condi
     - The current tests and `dump` commands are listed below, with the coredump filename based on the cargo bin name of each binary.
       - Armv6-m:`dump 0x20000000 0x4000 0x1000b150 0x1b00 target/RP2040.coredump`
       - Armv7-m:`dump 0x20000000 0x4000 0x4cf0 0x1070 target/NRF52833_xxAA.coredump`
-      - TODO: RISC-V32: `dump 0x3FC80000 0x60000 0x3c010020 0x2b88 target/RP2040.coredump`
+      - RISC-V32: Currently experiencing issues ... WIP
+        - `dump 0x3FC80000 0x18010 single_read_bad.coredump`
+        - `dump 0x3FC80000 0x18000 0x3FC98000 0x10 two_part_read_ok.coredump`
     - This file can now be moved into the `probe-rs/probe-rs` repository, to be used as a test source. Please update the `probe-rs/tests/README.md` in that repository with appropriate information to ensure anyone can accurately recreate the coredump.
       - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also.
   
