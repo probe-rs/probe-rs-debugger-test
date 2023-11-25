@@ -6,7 +6,7 @@
     {
       "label": "debug-no-opt",
       "type": "cargo",
-      "command": "size",
+      "command": "build",
       "args": [
         "--bin",
         "${fileBasenameNoExtension}",
@@ -16,9 +16,6 @@
         "${fileDirnameBasename}",
         "--profile",
         "debug-no-opt",
-        "--",
-        "-A",
-        "-x"
       ],
       "problemMatcher": ["$rustc"],
       "group": {
@@ -36,9 +33,8 @@
     {
       "label": "debug-lto-thin-opt-1",
       "type": "cargo",
-      "command": "size",
+      "command": "build",
       "args": [
-        // "build",
         "--bin",
         "${fileBasenameNoExtension}",
         "--features",
@@ -47,6 +43,59 @@
         "${fileDirnameBasename}",
         "--profile",
         "debug-lto-thin-opt-1",
+      ],
+      "problemMatcher": ["$rustc"],
+      "group": {
+        "kind": "build"
+      },
+      "presentation": {
+        "revealProblems": "onProblem",
+        "reveal": "silent",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "debug-lto-fat-opt-2",
+      "type": "cargo",
+      "command": "build",
+      "args": [
+        "--bin",
+        "${fileBasenameNoExtension}",
+        "--features",
+        "${fileBasenameNoExtension}",
+        "--target",
+        "${fileDirnameBasename}",
+        "--profile",
+        "debug-lto-fat-opt-2",
+      ],
+      "problemMatcher": ["$rustc"],
+      "group": {
+        "kind": "build"
+      },
+      "presentation": {
+        "revealProblems": "onProblem",
+        "reveal": "silent",
+        "showReuseMessage": false,
+        "clear": true,
+        "close": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "debug-no-opt-size",
+      "type": "cargo",
+      "command": "size",
+      "args": [
+        "--bin",
+        "${fileBasenameNoExtension}",
+        "--features",
+        "${fileBasenameNoExtension}",
+        "--target",
+        "${fileDirnameBasename}",
+        "--profile",
         "debug-no-opt",
         "--",
         "-A",
@@ -65,36 +114,5 @@
         "panel": "shared"
       }
     },
-    {
-      "label": "debug-lto-fat-opt-2",
-      "type": "cargo",
-      "command": "size",
-      "args": [
-        "--bin",
-        "${fileBasenameNoExtension}",
-        "--features",
-        "${fileBasenameNoExtension}",
-        "--target",
-        "${fileDirnameBasename}",
-        "--profile",
-        "debug-lto-fat-opt-2",
-        "debug-no-opt",
-        "--",
-        "-A",
-        "-x"
-      ],
-      "problemMatcher": ["$rustc"],
-      "group": {
-        "kind": "build"
-      },
-      "presentation": {
-        "revealProblems": "onProblem",
-        "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": true,
-        "close": false,
-        "panel": "shared"
-      }
-    }
   ]
 }

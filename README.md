@@ -31,21 +31,16 @@ The application can be run on mulitple architectures, and is controlled by condi
 
 2. Optional: Create coredump files that can be used in automated `probe-rs` debug tests.
 
-    - When launching the app in VSCode, choose the `debug-no-opt` launch profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
-    - The memory regions required in the coredump as follows:
-      - text: Check the `cargo-size` terminal window to see the memory locations and sizes of the `.rodata` location.
-      - data: Check the appropriate linker file for the region that corresponds to the `.data` secion of the binary, and use the memory location and size from the linker file.
+    - When building the app in VSCode, choose the `debug-no-opt-size` build profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
+    - Using the "DEBUG CONSOLE" window in VSCode, enter of of the `dump` commands below, in the REPL command line.
     - The current tests and `dump` commands are listed below, with the coredump filename based on the cargo bin name of each binary.
-      - Armv6-m:`dump 0x20000000 0x4000 0x1000b150 0x1b00 target/RP2040.coredump`
-      - Armv7-m:`dump 0x20000000 0x4000 0x4cf0 0x1070 target/NRF52833_xxAA.coredump`
-      - RISC-V32: Currently experiencing issues ... WIP
-        - `dump 0x3FC80000 0x18010 single_read_bad.coredump`
-        - `dump 0x3FC80000 0x18000 0x3FC98000 0x10 two_part_read_ok.coredump`
+      - Armv6-m:`dump target/RP2040.coredump`
+      - Armv7-m:`dump target/NRF52833_xxAA.coredump`
+      - RISC-V32:`dump target/esp32c3.coredump`
+    - Wait for the message that says "Core dump (Includes memory ranges: <snip> successfully stored at <snip>".
     - This file can now be moved into the `probe-rs/probe-rs` repository, to be used as a test source. Please update the `probe-rs/tests/README.md` in that repository with appropriate information to ensure anyone can accurately recreate the coredump.
       - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also.
   
-
-
 ## Adding support for new chips
 
 Support for new chips, can be added by making the copying one of the existing source files, and renaming it using the appropriate chip name from `probe-rs-debugger list-chips`. The new file should be placed in a folder named after the target-triple. Finally, `Cargo.toml` and `build.rs` should be updated to include the new chip name and features.
