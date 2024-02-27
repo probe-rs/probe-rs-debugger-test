@@ -33,9 +33,6 @@ unsafe fn HardFault(ef: &ExceptionFrame) -> ! {
 
 #[entry]
 fn main() -> ! {
-    // Common testing code.
-    let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
-
     // Board/Chip specific code.
     let mut pac = pac::Peripherals::take().unwrap();
     let core = pac::CorePeripherals::take().unwrap();
@@ -56,6 +53,9 @@ fn main() -> ! {
     .unwrap();
 
     let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
+
+    // Common testing code.
+    let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
 
     loop {
         // Common testing code.

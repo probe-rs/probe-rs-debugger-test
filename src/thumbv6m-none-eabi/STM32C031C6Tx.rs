@@ -27,10 +27,10 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[entry]
 fn main() -> ! {
+    // Board/Chip specific code.
+
     // Common testing code.
     let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
-
-    // Board/Chip specific code.
 
     loop {
         // Common testing code.

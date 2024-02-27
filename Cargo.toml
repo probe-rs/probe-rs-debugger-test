@@ -17,7 +17,7 @@ path = "src/common_testing_code.rs"
 
 [[bin]]
 name = "esp32c3"
-path = "src/riscv32imac-unknown-none-elf/esp32c3.rs"
+path = "src/riscv32imc-unknown-none-elf/esp32c3.rs"
 required-features = ["esp32c3"]
 
 [[bin]]
@@ -41,7 +41,7 @@ path = "src/thumbv6m-none-eabi/RP2040.rs"
 required-features = ["RP2040"]
 
 [features]
-esp32c3 = ["riscv", "esp32c3-hal"]
+esp32c3 = ["riscv", "esp32c3-hal", "semihosting"]
 STM32C031C6Tx = [
     "cortex-m",
     "cortex-m-rt",
@@ -65,8 +65,8 @@ RP2040 = ["cortex-m", "cortex-m-rt", "rp-pico", "cortex-m/inline-asm"]
 
 [dependencies]
 # Dependencies shared between different hardware
-rtt-target = { version = "0.4" }
-heapless = { version = "0.7", default-features = false }
+rtt-target = { version = "0.5" }
+heapless = { version = "0.8", default-features = false }
 
 # Feature specific dependencies
 nrf52833-hal = { version = "0.16", features = ["rt"], optional = true }
@@ -76,8 +76,9 @@ rp-pico = { version = "0.8.0", optional = true }
 cortex-m = { version = "0.7.7", optional = true }
 cortex-m-rt = { version = "0.7.3", optional = true }
 
-esp32c3-hal = { version = "0.13.0", optional = true } #, features = ["direct-boot"] # To use direct-boot, in stead of ESP-IDF bootloader.
-riscv = { version = "0.10.1", optional = true }
+esp32c3-hal = { version = "0.15.0", optional = true }
+riscv = { version = "0.11.1", optional = true }
+semihosting = {version = "0.1.5", optional = true}
 
 [patch.crates-io]
 esp32c3-hal = { git = "https://github.com/esp-rs/esp-hal" }

@@ -28,10 +28,12 @@ The application can be run on mulitple architectures, and is controlled by condi
 
     - The `.vscode/launch.json` and `.vscode/tasks.json` are preconfigured, and will adjust behaviour based on the active source file in the editor. The configuration uses VSCode variables referencing both the file name and the parent folder name, to determine the correct values in the configuration to use.
     - The `.vscode/launch.json` prompts for levels of optimization required. The intention is to simplify the creation of various binaries for automated testing of `probe-rs` debug api.
+    - To build a specific source file, e.g. `STM32H745ZITx.rs` from the command line, use the following:
+    `cargo build --bin STM32H745ZITx --features STM32H745ZITx --target thumbv7em-none-eabi --profile debug-no-opt`
 
 2. Optional: Create coredump files that can be used in automated `probe-rs` debug tests.
 
-    - When building the app in VSCode, choose the `debug-no-opt-size` build profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
+    - When building the app in VSCode, choose the `debug-no-opt` build profile. This will build, flash, and run the test application until it reaches the softare breakpoint in the code.
     - Using the "DEBUG CONSOLE" window in VSCode, enter of of the `dump` commands below, in the REPL command line.
     - The current tests and `dump` commands are listed below, with the coredump filename based on the cargo bin name of each binary.
       - Armv6-m:`dump target/RP2040.coredump`

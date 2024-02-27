@@ -25,30 +25,16 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[entry]
 fn main() -> ! {
-    // Common testing code.
-    let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
-
     // Board/Chip specific code.
     let peripherals = peripherals::Peripherals::take();
     let system = peripherals.SYSTEM.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
-    // To ensure we can step through breakpoints/code, we have to disable the watchdog timers.
-    // Disable the watchdog timers. For the ESP32-C3, this includes the Super WDT,
-    // the RTC WDT, and the TIMG WDTs.
-    let mut rtc = Rtc::new(peripherals.RTC_CNTL);
-    let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
-    let mut wdt0 = timer_group0.wdt;
-    let timer_group1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-    let mut wdt1 = timer_group1.wdt;
-
-    rtc.swd.disable();
-    rtc.rwdt.disable();
-    wdt0.disable();
-    wdt1.disable();
-
     // Initialize the Delay peripheral.
     let mut delay = Delay::new(&clocks);
+
+    // Common testing code.
+    let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
 
     loop {
         // Common testing code.

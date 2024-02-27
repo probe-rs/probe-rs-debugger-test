@@ -84,35 +84,5 @@
         "panel": "shared"
       }
     },
-    {
-      "label": "debug-no-opt-size",
-      "type": "cargo",
-      "command": "size",
-      "args": [
-        "--bin",
-        "${fileBasenameNoExtension}",
-        "--features",
-        "${fileBasenameNoExtension}",
-        "--target",
-        "${fileDirnameBasename}",
-        "--profile",
-        "debug-no-opt",
-        "--",
-        "-A",
-        "-x"
-      ],
-      "problemMatcher": ["$rustc"],
-      "group": {
-        "kind": "build"
-      },
-      "presentation": {
-        "revealProblems": "onProblem",
-        "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": true,
-        "close": false,
-        "panel": "shared"
-      }
-    },
   ]
 }

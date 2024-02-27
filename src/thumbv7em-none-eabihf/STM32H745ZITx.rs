@@ -59,10 +59,6 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
 #[entry]
 fn main() -> ! {
-    // Common testing code.
-    let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
-    test_deep_stack(0);
-
     // Board/Chip specific code.
     let p = cortex_m::Peripherals::take().unwrap();
     let mut syst = p.SYST;
@@ -74,6 +70,9 @@ fn main() -> ! {
     syst.clear_current();
     syst.enable_counter();
     syst.enable_interrupt();
+
+    // Common testing code.
+    let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
 
     loop {
         // Common testing code.

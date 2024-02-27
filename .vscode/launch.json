@@ -7,15 +7,16 @@
       "request": "launch",
       "name": "probe-rs-debugger",
       "chip": "${fileBasenameNoExtension}",
-      "cwd": "${workspaceFolder}",
+      // "cwd": "${workspaceFolder}",
+      
       // "runtimeExecutable": "probe-rs", // OPTIONAL: If you want to use a specific version/install location of probe-rs.
       // "runtimeArgs": ["debug"], // OPTIONAL: Add additional arguments to the probe-rs command.
       // "probe": "${config:vid-pid}", // OPTIONAL: This can be omitted if there is only one probe connected.
       "coreConfigs": [
         {
           "coreIndex": 0,
-          "programBinary": "${workspaceFolder}/target/${fileDirnameBasename}/${input:profile}/${fileBasenameNoExtension}",
-          "svdFile": "svd_files/${fileBasenameNoExtension}.svd",
+          "programBinary": "./target/${fileDirnameBasename}/${input:profile}/${fileBasenameNoExtension}",
+          "svdFile": "./svd_files/${fileBasenameNoExtension}.svd",
           "rttEnabled": true,
           "rttChannelFormats": [
             {
@@ -32,15 +33,16 @@
       ],
       "flashingConfig": {
         "flashingEnabled": true,
-        "haltAfterReset": false,
+        "haltAfterReset": false
       },
       // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
-      // "consoleLogLevel": "Debug",
-      // "env": {
-      // "RUST_LOG": "trace"
-      // "DEFMT_LOG": "debug"
-      // },
-      "speed": 4000 // CONFIGURE: Optionally update USB speed
+      // "connectUnderReset": true,
+      "consoleLogLevel": "Debug",
+      "env": {
+      "RUST_LOG": "debug",
+      "DEFMT_LOG": "debug"
+      },
+      "speed": 1000 // CONFIGURE: Optionally update USB speed
     }
   ],
   "inputs": [

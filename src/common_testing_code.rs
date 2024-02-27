@@ -8,7 +8,7 @@
 use core::num::Wrapping;
 use core::usize;
 use heapless::Vec;
-use rtt_target::{rprintln, rtt_init, set_print_channel};
+use rtt_target::{rprintln, rtt_init, set_print_channel, ChannelMode::NoBlockTrim};
 
 // Definitions for testing debugger with various datatypes
 // N.B. These are `mut` only so they don't constant fold away.
@@ -305,13 +305,13 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
     let loop_counter = Wrapping(0u8);
     let rtt_channels = rtt_init! { up: {
             0: {
-                size: 1024
-                mode: NoBlockTrim// NoBlockSkip //BlockIfFull
+                size: 1024,
+                mode: NoBlockTrim,  // NoBlockSkip //BlockIfFull
                 name: "String RTT Channel"
             }
             1: {
-                size: 1024
-                mode: NoBlockTrim
+                size: 1024,
+                mode: NoBlockTrim,
                 name: "BinaryLE RTT Channel"
             }
         }
@@ -321,6 +321,7 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
     unsafe {
         rprintln!("Forcing use of :{}", LOCAL_STATIC);
     }
+
     test_deep_stack(0);
 
     (loop_counter, rtt_channels.up.1)
