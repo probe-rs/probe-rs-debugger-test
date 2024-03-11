@@ -6,22 +6,11 @@
 #![allow(unused_assignments)]
 
 // This section contains the declarations that is common to all the tests, and is not specific to any one chip/board.
-use common_testing_code::*;
-use rtt_target::rprintln;
+use probe_rs_debugger_test::*;
 
 // Board/Chip specific code.
-use esp32c3_hal::{clock::ClockControl, peripherals, prelude::*, timer::TimerGroup, Delay, Rtc};
-
-#[panic_handler]
-fn panic(info: &core::panic::PanicInfo) -> ! {
-    rprintln!("Panic: {:?}", info);
-    loop {
-        unsafe {
-            core::arch::asm!("ebreak");
-        }
-        rprintln!("In a panic loop, stepped past the breakpoint");
-    }
-}
+use esp_hal::{clock::ClockControl, peripherals, prelude::*, Delay};
+use esp_riscv_rt::entry;
 
 #[entry]
 fn main() -> ! {

@@ -4,85 +4,26 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "debug-no-opt",
-      "type": "cargo",
-      "command": "build",
+      "label": "probe-rs-debugger-test",
+      "type": "process",
+      "command": "cargo",
+      // Do not edit these args. They are set by the workspace settings.
       "args": [
+        "build",
         "--bin",
-        "${fileBasenameNoExtension}",
-        "--features",
-        "${fileBasenameNoExtension}",
-        "--target",
-        "${fileDirnameBasename}",
+        "${config:probe-rs-chip}",
         "--profile",
-        "debug-no-opt",
+        "${config:probe-rs-profile}",
+        "--target",
+        "${config:rust-analyzer.cargo.target}",
+        "--features",
+        "${config:rust-analyzer.cargo.features}"
       ],
       "problemMatcher": ["$rustc"],
       "group": {
-        "kind": "build"
-      },
-      "presentation": {
-        "revealProblems": "onProblem",
-        "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": true,
-        "close": false,
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "debug-lto-thin-opt-1",
-      "type": "cargo",
-      "command": "build",
-      "args": [
-        "--bin",
-        "${fileBasenameNoExtension}",
-        "--features",
-        "${fileBasenameNoExtension}",
-        "--target",
-        "${fileDirnameBasename}",
-        "--profile",
-        "debug-lto-thin-opt-1",
-      ],
-      "problemMatcher": ["$rustc"],
-      "group": {
-        "kind": "build"
-      },
-      "presentation": {
-        "revealProblems": "onProblem",
-        "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": true,
-        "close": false,
-        "panel": "shared"
-      }
-    },
-    {
-      "label": "debug-lto-fat-opt-2",
-      "type": "cargo",
-      "command": "build",
-      "args": [
-        "--bin",
-        "${fileBasenameNoExtension}",
-        "--features",
-        "${fileBasenameNoExtension}",
-        "--target",
-        "${fileDirnameBasename}",
-        "--profile",
-        "debug-lto-fat-opt-2",
-      ],
-      "problemMatcher": ["$rustc"],
-      "group": {
-        "kind": "build"
-      },
-      "presentation": {
-        "revealProblems": "onProblem",
-        "reveal": "silent",
-        "showReuseMessage": false,
-        "clear": true,
-        "close": false,
-        "panel": "shared"
-      }
-    },
+        "kind": "build",
+        "isDefault": true
+      }    
+    }
   ]
 }

@@ -1,0 +1,31 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    // The following are convenience settings for code editing.
+    "rust-analyzer.checkOnSave": true,
+
+    // All entries below must be configured to match the target device and required features.
+    "probe-rs-chip": "nRF52833_xxAA", // CONFIGURE: Replace with probe-rs supported CHIP name
+    "probe-rs-profile": "debug-no-opt",
+    // PLEASE NOTE: For some reason, these have to be duplicated in the "rust-analyzer.check.overrideCommand" setting.
+    "rust-analyzer.cargo.target": "thumbv7em-none-eabihf", // CONFIGURE: Replace target identity
+    "rust-analyzer.cargo.features": ["nRF52833_xxAA"], // CONFIGURE: Replace with probe-rs supported CHIP name
+    "rust-analyzer.cargo.extraArgs": ["--bin", "nRF52833_xxAA"], // CONFIGURE: Replace with probe-rs supported CHIP name
+    "rust-analyzer.check.overrideCommand": [
+      "cargo",
+      "clippy",
+      "--message-format",
+      "json-diagnostic-rendered-ansi",
+      "--features",
+      "nRF52833_xxAA", // CONFIGURE: Replace with probe-rs supported CHIP name
+      "--bin",
+      "nRF52833_xxAA", // CONFIGURE: Replace with probe-rs supported CHIP name
+      "--target",
+      "thumbv7em-none-eabihf" // CONFIGURE: Replace target identity
+    ]
+  }
+}

@@ -5,19 +5,19 @@ use std::io::Write;
 use std::path::PathBuf;
 
 fn main() {
-    #[cfg(any(
-        feature = "STM32C031C6Tx",
-        feature = "STM32H745ZITx",
-        feature = "RP2040",
-        feature = "nRF52833_xxAA",
-        feature = "esp32c3"
-    ))]
+    #[cfg(not(any(
+        feature = "full_unwind",
+        feature = "systick",
+        feature = "svcall",
+        feature = "hardfault_from_usagefault",
+        feature = "hardfault_from_busfault",
+        feature = "hardfault_in_systick"
+    )))]
+    compile_error!("Please enable one of the unwind features in `Carog.toml` to build the project");
+
+    #[cfg(any(feature = "RP2040", feature = "nRF52833_xxAA", feature = "esp32c3"))]
     {
         // SECTION: Get `chip_name` from the feature name.
-        #[cfg(feature = "STM32C031C6Tx")]
-        let _chip_name = "STM32C031C6Tx";
-        #[cfg(feature = "STM32H745ZITx")]
-        let _chip_name = "STM32H745ZITx";
         #[cfg(feature = "RP2040")]
         let _chip_name = "RP2040";
         #[cfg(feature = "nRF52833_xxAA")]
@@ -25,28 +25,11 @@ fn main() {
         #[cfg(feature = "esp32c3")]
         let _chip_name = "esp32c3";
 
-        // SECTION: Set the target triple environment variable.
-        #[cfg(feature = "STM32C031C6Tx")]
-        println!("cargo:rustc-env=TARGET=thumbv6m-none-eabi");
-        #[cfg(feature = "STM32H745ZITx")]
-        println!("cargo:rustc-env=TARGET=thumbv7em-none-eabihf");
-        #[cfg(feature = "RP2040")]
-        println!("cargo:rustc-env=TARGET=thumbv6m-none-eabi");
-        #[cfg(feature = "nRF52833_xxAA")]
-        println!("build:target=thumbv7em-none-eabihf");
-        #[cfg(feature = "esp32c3")]
-        println!("cargo:rustc-env=TARGET=riscv32imac-unknown-none-elf");
-
         // SECTION: Get the directory where build script livesfrom the environment.
         let workspace_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
 
         // SECTION: The name of the link script used by the linker.
-        #[cfg(any(
-            feature = "STM32C031C6Tx",
-            feature = "STM32H745ZITx",
-            feature = "RP2040",
-            feature = "nRF52833_xxAA"
-        ))]
+        #[cfg(any(feature = "RP2040", feature = "nRF52833_xxAA"))]
         println!("cargo:rustc-link-arg-bins=-Tlink.x");
 
         #[cfg(feature = "esp32c3")]
