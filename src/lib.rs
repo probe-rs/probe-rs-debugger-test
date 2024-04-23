@@ -1,14 +1,14 @@
 #![no_std]
 #![no_main]
-// Because this is not code that doesn't need to serve a purpose other than testing the debugger
+// Because this is code that doesn't need to serve a purpose other than testing the debugger
 #![allow(unused_variables)]
 #![allow(dead_code)]
 #![allow(unused_assignments)]
 
 use core::num::Wrapping;
-use core::usize;
+use core::ptr::addr_of;
 use heapless::Vec;
-use rtt_target::{rprintln, rtt_init, set_print_channel};
+use rtt_target::{rprintln, rtt_init, set_print_channel, ChannelMode::NoBlockTrim};
 
 // Definitions for testing debugger with various datatypes
 // N.B. These are `mut` only so they don't constant fold away.
@@ -206,7 +206,7 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
         "A 'local' to main() static variable ...will be optimized out if not used in the code.";
     let local_reference_to_global_const = GLOBAL_CONSTANT;
     let local_reference_to_global_static = unsafe { GLOBAL_STATIC };
-    let local_reference_to_global_static_struct = unsafe { &REGULAR_STRUCT };
+    let local_reference_to_global_static_struct = unsafe { addr_of!(REGULAR_STRUCT) };
     let ghosted_variable = 0_usize;
     let ghosted_variable = "New value and type for a different name";
     let int8_twenty_six: i8 = 26;
@@ -305,13 +305,13 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
     let loop_counter = Wrapping(0u8);
     let rtt_channels = rtt_init! { up: {
             0: {
-                size: 1024
-                mode: NoBlockTrim// NoBlockSkip //BlockIfFull
+                size: 1024,
+                mode: NoBlockTrim,  // NoBlockSkip //BlockIfFull
                 name: "String RTT Channel"
             }
             1: {
-                size: 1024
-                mode: NoBlockTrim
+                size: 1024,
+                mode: NoBlockTrim,
                 name: "BinaryLE RTT Channel"
             }
         }
@@ -321,6 +321,7 @@ pub fn setup_data_types() -> (Wrapping<u8>, rtt_target::UpChannel) {
     unsafe {
         rprintln!("Forcing use of :{}", LOCAL_STATIC);
     }
+
     test_deep_stack(0);
 
     (loop_counter, rtt_channels.up.1)
@@ -338,15 +339,14 @@ pub fn test_deep_stack(stack_depth: usize) {
         rprintln!("Returning from call # {} ", internal_depth_measure);
     } else {
         // We force a software breakpoint here, so that our tests can rely on the target state being stopped exactly here.
-        #[cfg(not(feature = "esp32c3"))]
+        #[cfg(all(not(feature = "esp32c3"), feature = "full_unwind"))]
         unsafe {
             core::arch::asm!("bkpt");
         }
-        #[cfg(feature = "esp32c3")]
+        #[cfg(all(feature = "esp32c3", feature = "full_unwind"))]
         unsafe {
             core::arch::asm!("ebreak");
         }
-        rprintln!("Dropping out of the deep recursive stack test");
     }
 }
 
@@ -362,4 +362,25 @@ pub fn shared_loop_processing(
         bytes_written,
     );
     *loop_counter += Wrapping(1u8);
+}
+
+#[inline(always)]
+pub fn software_breakpoint() {
+    #[cfg(not(feature = "esp32c3"))]
+    unsafe {
+        core::arch::asm!("bkpt");
+    }
+    #[cfg(feature = "esp32c3")]
+    unsafe {
+        core::arch::asm!("ebreak");
+    }
+}
+
+#[panic_handler]
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    rprintln!("panic: {:?}", info);
+    loop {
+        // This breakpoint is to validate that the debugger can unwind the panic handler.
+        software_breakpoint();
+    }
 }

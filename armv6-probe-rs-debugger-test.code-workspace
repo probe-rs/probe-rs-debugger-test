@@ -1,0 +1,31 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    // The following are convenience settings for code editing.
+    "rust-analyzer.checkOnSave": true,
+
+    // All entries below must be configured to match the target device and required features.
+    "probe-rs-chip": "RP2040", // CONFIGURE: Replace with probe-rs supported CHIP name
+    "probe-rs-profile": "debug-no-opt",
+    // PLEASE NOTE: For some reason, these have to be duplicated in the "rust-analyzer.check.overrideCommand" setting.
+    "rust-analyzer.cargo.target": "thumbv6m-none-eabi", // CONFIGURE: Replace target identity
+    "rust-analyzer.cargo.features": ["RP2040"], // CONFIGURE: Replace with probe-rs supported CHIP name
+    "rust-analyzer.cargo.extraArgs": ["--bin", "RP2040"], // CONFIGURE: Replace with probe-rs supported CHIP name
+    "rust-analyzer.check.overrideCommand": [
+      "cargo",
+      "clippy",
+      "--message-format",
+      "json-diagnostic-rendered-ansi",
+      "--features",
+      "RP2040", // CONFIGURE: Replace with probe-rs supported CHIP name
+      "--bin",
+      "RP2040", // CONFIGURE: Replace with probe-rs supported CHIP name
+      "--target",
+      "thumbv6m-none-eabi" // CONFIGURE: Replace target identity
+    ]
+  }
+}

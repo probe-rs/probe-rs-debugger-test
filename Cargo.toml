@@ -5,68 +5,75 @@ version = "0.3.0"
 authors = ["Jack Noppe <noppej@hotmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
-autobins = false
 autoexamples = false
 autotests = false
 autobenches = false
 resolver = "2"
 
-[lib]
-name = "common_testing_code"
-path = "src/common_testing_code.rs"
-
 [[bin]]
 name = "esp32c3"
-path = "src/riscv32imac-unknown-none-elf/esp32c3.rs"
 required-features = ["esp32c3"]
 
 [[bin]]
-name = "STM32C031C6Tx"
-path = "src/thumbv6m-none-eabi/STM32C031C6Tx.rs"
-required-features = ["STM32C031C6Tx"]
-
-[[bin]]
-name = "STM32H745ZITx"
-path = "src/thumbv7em-none-eabihf/STM32H745ZITx.rs"
-required-features = ["STM32H745ZITx"]
-
-[[bin]]
 name = "nRF52833_xxAA"
-path = "src/thumbv7em-none-eabihf/nRF52833_xxAA.rs"
 required-features = ["nRF52833_xxAA"]
 
 [[bin]]
 name = "RP2040"
-path = "src/thumbv6m-none-eabi/RP2040.rs"
 required-features = ["RP2040"]
 
 [features]
-esp32c3 = ["riscv", "esp32c3-hal"]
-STM32C031C6Tx = [
+RP2040 = [
     "cortex-m",
     "cortex-m-rt",
-    "cortex-m/critical-section-single-core",
+    "rp-pico",
     "cortex-m/inline-asm",
+    # CONFIGUIRE: Enable one of these to test the debugger's ability to unwind specific use cases.
+    "full_unwind",
+    # "systick",
+    # "svcall",
+    # "hardfault_from_usagefault", #TODO: This unwind is incorrect when it transitions from udf() to main()
+    # "hardfault_from_busfault",
+    # "hardfault-in-systick" ,
 ]
-STM32H745ZITx = [
-    "cortex-m",
-    "cortex-m-rt",
-    "cortex-m/critical-section-single-core",
-    "cortex-m/inline-asm",
-]
+
 nRF52833_xxAA = [
     "cortex-m",
     "cortex-m-rt",
     "nrf52833-hal",
     "cortex-m/critical-section-single-core",
     "cortex-m/inline-asm",
+    # CONFIGUIRE: Enable one of these to test the debugger's ability to unwind specific use cases.
+    "full_unwind",
+    # "systick",
+    # "svcall",
+    # "hardfault_from_usagefault", #TODO: This unwind is incorrect when it transitions from udf() to main()
+    # "hardfault_from_busfault",
+    # "hardfault-in-systick" ,
 ]
-RP2040 = ["cortex-m", "cortex-m-rt", "rp-pico", "cortex-m/inline-asm"]
+
+esp32c3 = [
+    "esp-hal",
+    "esp-riscv-rt",
+    # CONFIGUIRE: Enable one of these to test the debugger's ability to unwind specific use cases.
+    "full_unwind",
+    ]
+
+# The following features control which unwind behaviours will be triggered in the code.
+# They are used to test the debugger's ability to handle exceptions, and are optional.
+# If not specified, the code will run to a software breakpoint, which is common in all features.
+# NOTE: There are currently no guards on these, so care should be taken to not enable multiple at once.
+full_unwind = []
+systick = []
+svcall = []
+hardfault_from_usagefault = []
+hardfault_from_busfault = []
+hardfault-in-systick = ["systick", "hardfault_from_busfault"]
 
 [dependencies]
 # Dependencies shared between different hardware
-rtt-target = { version = "0.4" }
-heapless = { version = "0.7", default-features = false }
+rtt-target = { version = "0.5" }
+heapless = { version = "0.8", default-features = false }
 
 # Feature specific dependencies
 nrf52833-hal = { version = "0.16", features = ["rt"], optional = true }
@@ -76,12 +83,11 @@ rp-pico = { version = "0.8.0", optional = true }
 cortex-m = { version = "0.7.7", optional = true }
 cortex-m-rt = { version = "0.7.3", optional = true }
 
-esp32c3-hal = { version = "0.12.0", optional = true } #, features = ["direct-boot"] # To use direct-boot, in stead of ESP-IDF bootloader.
-riscv = { version = "0.10.1", optional = true }
+esp-hal = { version = "0.16.0",features = ["esp32c3"], optional = true }
+esp-riscv-rt = { version = "0.7.0", optional = true }
 
-
-[profile.dev]
-debug = "full"
+[patch.crates-io]
+cortex-m-rt = {git="https://github.com/rust-embedded/cortex-m"}
 
 [profile.debug-no-opt]
 inherits = "dev"
