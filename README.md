@@ -30,12 +30,26 @@ The application can be run on mulitple architectures, and is controlled by condi
     - When building the app in VSCode, the defaul is to build, flash, and run the test application until it reaches the softare breakpoint in the code (the  Cargo.toml` feature for this is `full_unwind`)
     - Using the "DEBUG CONSOLE" window in VSCode, enter of of the `dump` commands below, in the REPL command line.
     - The current tests and `dump` commands are listed below, with the coredump filename based on the cargo bin name of each binary.
-      - Armv6-m:`dump target/RP2040.coredump`
-      - Armv7-m:`dump target/NRF52833_xxAA.coredump`
-      - RISC-V32:`dump target/esp32c3.coredump`
+      - Armv6-m:`dump tests/RP2040_<unwind feature>.coredump`, where `<unwind feature>` is one of:
+        - `full_unwind`
+        - `systick`
+        - `svcall`
+        - `hardfault_from_usagefault` (TODO: unable to do coredump, due to multidrop error)
+        - `hardfault_from_busfault` (TODO: unable to do coredump, due to multidrop error)
+        - `hardfault-in-systick` (TODO: unable to do coredump, due to multidrop error)
+      - Armv7-m:`dump target/NRF52833_xxAA_<unwind feature>.coredump`, where `<unwind feature>` is one of:
+        - `full_unwind`
+        - `systick`
+        - `svcall`
+        - `hardfault_from_usagefault`
+        - `hardfault_from_busfault`
+        - `hardfault-in-systick`
+      - RISC-V32:`dump target/esp32c3_<unwind feature>.coredump`, where `<unwind feature>` is one of:
+        - `full_unwind`
     - Wait for the message that says "Core dump (Includes memory ranges: ... successfully stored at ...)".
     - This file can now be moved into the `probe-rs/probe-rs` repository, to be used as a test source. Please update the `probe-rs/tests/README.md` in that repository with appropriate information to ensure anyone can accurately recreate the coredump.
-      - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also, and the convention is to rename it to the same base file name as the corresponding `.coredump` file.
+      - Note: To do any meaningful testing, you will probably need the appropriate binary from the `target` directory also, and the convention is to rename it to the same base file name as the corresponding `.coredump` file,
+      and to add a `.elf` extension.
   
 ## Adding support for new chips
 

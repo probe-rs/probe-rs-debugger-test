@@ -9,7 +9,7 @@
 use probe_rs_debugger_test::*;
 
 // Board/Chip specific code.
-use esp_hal::{clock::ClockControl, peripherals, prelude::*, Delay};
+use esp_hal::{clock::ClockControl, delay::Delay, peripherals, prelude::*};
 use esp_riscv_rt::entry;
 
 #[entry]
@@ -20,7 +20,7 @@ fn main() -> ! {
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
     // Initialize the Delay peripheral.
-    let mut delay = Delay::new(&clocks);
+    let delay = Delay::new(&clocks);
 
     // Common testing code.
     let (mut loop_counter, mut binary_rtt_channel) = setup_data_types();
@@ -30,6 +30,6 @@ fn main() -> ! {
         shared_loop_processing(&mut binary_rtt_channel, &mut loop_counter);
 
         // Board/Chip specific code.
-        delay.delay_ms(20u8);
+        delay.delay_millis(20u32);
     }
 }
