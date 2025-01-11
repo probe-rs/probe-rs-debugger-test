@@ -6,8 +6,23 @@ use miette::IntoDiagnostic;
 use xshell::cmd;
 
 fn main() -> miette::Result<()> {
-    let build_command =
-        Command::new("build").arg(Arg::new("cmd").long("command").default_value("build"));
+    let build_command = Command::new("build")
+        .arg(Arg::new("cmd").long("command").default_value("build"))
+        .arg(
+            Arg::new("release")
+                .long("release")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("reproducible")
+                .long("reproducible")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("testcase")
+                .long("testcase")
+                .default_value("full_unwind"),
+        );
 
     let m = Command::new("xtask")
         .subcommand_required(true)
@@ -15,9 +30,38 @@ fn main() -> miette::Result<()> {
         .get_matches();
 
     match m.subcommand() {
-        Some(("build", matches)) => build(),
+        Some(("build", matches)) => {
+            let command = matches.get_one::<String>("cmd").unwrap();
+            let release_build: bool = matches.get_flag("release");
+            let reproducible: bool = matches.get_flag("reproducible");
+            let test_case = matches.get_one::<String>("testcase").unwrap();
+
+            let settings = BuildSettings {
+                release: release_build,
+                command: command.clone(),
+                reproducible,
+            };
+
+            build(&settings, &test_case)
+        }
         _ => unreachable!("Subcommand required settings prevents this."),
     }
+}
+
+const TEST_CASES: &[&str] = &[
+    "full_unwind",
+    "systick",
+    "svcall",
+    "hardfault_from_usagefault",
+    "hardfault_from_busfault",
+    "hardfault-in-systick",
+];
+
+#[derive(Debug)]
+struct BuildSettings {
+    release: bool,
+    command: String,
+    reproducible: bool,
 }
 
 #[derive(Debug)]
@@ -41,15 +85,16 @@ const TARGETS: &[BuildTarget] = &[
     BuildTarget::new_static("esp32c3", "riscv32imc-unknown-none-elf"),
 ];
 
-fn build() -> miette::Result<()> {
+fn build(settings: &BuildSettings, test_case: &str) -> miette::Result<()> {
     let sh = xshell::Shell::new().into_diagnostic()?;
 
     // Try to create deterministic builds
 
-    sh.set_var(
-        "RUSTFLAGS",
-        "--remap-path-prefix /Users/tiwalun/.cargo/registry=/Users/jacknoppe/.cargo/registry",
-    );
+    if settings.reproducible {
+        sh.set_var(
+            "RUSTFLAGS",
+            "--remap-path-prefix /Users/tiwalun/.cargo=/Users/jacknoppe/.cargo --remap-path-prefix /Users/tiwalun/code/probe-rs-debugger-test=/Users/jacknoppe/dev/debug/probe-rs-debugger-test");
+    }
 
     for t in TARGETS {
         println!("Building for {}", t.chip);
@@ -66,9 +111,17 @@ fn build() -> miette::Result<()> {
         let features = vec![t.chip.as_ref()];
         let features_arg = features.join(",");
 
+        let mut args = vec!["--features", &features_arg];
+
+        if settings.release {
+            args.push("--release")
+        };
+
+        let command = &settings.command;
+
         cmd!(
             sh,
-            "cargo build --bin {bin_name} --features {features_arg} --target {rust_target} --locked"
+            "cargo {command} --bin {bin_name} {args...} --target {rust_target} --locked --features {test_case}"
         )
         .run()
         .into_diagnostic()?;
