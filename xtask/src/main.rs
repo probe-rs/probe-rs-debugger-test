@@ -1,11 +1,13 @@
 use std::borrow::Cow;
 
+use clap::Arg;
 use clap::Command;
 use miette::IntoDiagnostic;
 use xshell::cmd;
 
 fn main() -> miette::Result<()> {
-    let build_command = Command::new("build");
+    let build_command =
+        Command::new("build").arg(Arg::new("cmd").long("command").default_value("build"));
 
     let m = Command::new("xtask")
         .subcommand_required(true)
@@ -13,7 +15,7 @@ fn main() -> miette::Result<()> {
         .get_matches();
 
     match m.subcommand() {
-        Some(("build", _)) => build(),
+        Some(("build", matches)) => build(),
         _ => unreachable!("Subcommand required settings prevents this."),
     }
 }
@@ -33,13 +35,21 @@ impl BuildTarget {
     }
 }
 
-const TARGETS: &[BuildTarget] = &[BuildTarget::new_static(
-    "nRF52833_xxAA",
-    "thumbv7em-none-eabihf",
-)];
+const TARGETS: &[BuildTarget] = &[
+    BuildTarget::new_static("nRF52833_xxAA", "thumbv7em-none-eabihf"),
+    BuildTarget::new_static("RP2040", "thumbv6m-none-eabi"),
+    BuildTarget::new_static("esp32c3", "riscv32imc-unknown-none-elf"),
+];
 
 fn build() -> miette::Result<()> {
-    let shell = xshell::Shell::new().into_diagnostic()?;
+    let sh = xshell::Shell::new().into_diagnostic()?;
+
+    // Try to create deterministic builds
+
+    sh.set_var(
+        "RUSTFLAGS",
+        "--remap-path-prefix /Users/tiwalun/.cargo/registry=/Users/jacknoppe/.cargo/registry",
+    );
 
     for t in TARGETS {
         println!("Building for {}", t.chip);
@@ -47,7 +57,7 @@ fn build() -> miette::Result<()> {
 
         let rust_target = t.rust_target.as_ref();
 
-        cmd!(shell, "rustup target add {rust_target}")
+        cmd!(sh, "rustup target add {rust_target}")
             .run()
             .into_diagnostic()?;
 
@@ -57,8 +67,8 @@ fn build() -> miette::Result<()> {
         let features_arg = features.join(",");
 
         cmd!(
-            shell,
-            "cargo build --bin {bin_name} --features {features_arg} --target {rust_target}"
+            sh,
+            "cargo build --bin {bin_name} --features {features_arg} --target {rust_target} --locked"
         )
         .run()
         .into_diagnostic()?;
