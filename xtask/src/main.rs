@@ -150,6 +150,9 @@ const TARGETS: &[BuildTarget] = &[
     BuildTarget::new_static("esp32c3", "riscv32imc-unknown-none-elf"),
 ];
 
+const REMAPPED_CARGO_HOME: &str = "/probe-rs/.cargo";
+const REMAPPED_COMPILE_DIR: &str = "/probe-rs/compile-dir";
+
 /// Build the test case for all targets
 ///
 /// Return the paths to the built binaries
@@ -164,11 +167,25 @@ fn build(
 
     let cargo_home = Path::new(&cargo_home).canonicalize().unwrap();
 
+    let path_mappings = [
+        (cargo_home.as_path(), REMAPPED_CARGO_HOME),
+        (repo_root.as_path(), REMAPPED_COMPILE_DIR),
+    ];
+
+    let flags: Vec<String> = path_mappings
+        .into_iter()
+        .map(|(from, to)| format!("--remap-path-prefix={}={}", from.display(), to))
+        .collect();
+
+    println!("Flags: {:?}", flags);
+
+    let rust_flags = flags.join("\x1f");
+
+    println!("encoded flags: {:?}", flags);
+
     // Try to create deterministic builds
     if settings.reproducible {
-        sh.set_var(
-            "RUSTFLAGS",
-            format!("--remap-path-prefix {}=/Users/jacknoppe/.cargo --remap-path-prefix {}=/Users/jacknoppe/dev/debug/probe-rs-debugger-test", cargo_home.display(), repo_root.display()));
+        sh.set_var("CARGO_ENCODED_RUSTFLAGS", rust_flags);
     }
 
     let mut built_binaries = Vec::new();
