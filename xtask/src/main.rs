@@ -1,9 +1,19 @@
 use std::borrow::Cow;
+use std::path::Path;
+use std::path::PathBuf;
 
 use clap::Arg;
 use clap::Command;
+use miette::miette;
+use miette::Context;
 use miette::IntoDiagnostic;
 use xshell::cmd;
+
+fn repo_root() -> PathBuf {
+    let xtask_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+
+    xtask_dir.parent().unwrap().canonicalize().unwrap()
+}
 
 fn main() -> miette::Result<()> {
     let build_command = Command::new("build")
@@ -24,10 +34,15 @@ fn main() -> miette::Result<()> {
                 .default_value("full_unwind"),
         );
 
+    let ci_build_command = Command::new("ci-build");
+
     let m = Command::new("xtask")
         .subcommand_required(true)
         .subcommand(build_command)
+        .subcommand(ci_build_command)
         .get_matches();
+
+    let sh = xshell::Shell::new().into_diagnostic()?;
 
     match m.subcommand() {
         Some(("build", matches)) => {
@@ -42,7 +57,55 @@ fn main() -> miette::Result<()> {
                 reproducible,
             };
 
-            build(&settings, &test_case)
+            let _ = build(&sh, &settings, &test_case)?;
+
+            Ok(())
+        }
+        Some(("ci-build", _matches)) => {
+            let repo_root = repo_root();
+
+            let settings = BuildSettings {
+                release: false,
+                command: "build".to_string(),
+                reproducible: true,
+            };
+
+            let output_dir = repo_root.join("test-binaries");
+
+            if !output_dir.exists() {
+                std::fs::create_dir(&output_dir).into_diagnostic()?;
+            }
+
+            for test_case in TEST_CASES {
+                println!("Building test case {test_case}");
+                let built_binaries = build(&sh, &settings, test_case)?;
+
+                // TODO: Copy the binaries into the correct location
+
+                for bin in built_binaries {
+                    let file_name = bin.file_name().ok_or_else(|| {
+                        miette!("Missing file name for binary in path {}", bin.display())
+                    })?;
+
+                    let file_name = file_name.to_string_lossy();
+
+                    let output_filename = format!("{file_name}_{test_case}.elf");
+
+                    let new_path = output_dir.join(output_filename);
+
+                    std::fs::copy(&bin, &new_path)
+                        .into_diagnostic()
+                        .wrap_err_with(|| {
+                            format!(
+                                "Failed to copy file from '{}' to '{}'",
+                                bin.display(),
+                                new_path.display()
+                            )
+                        })?;
+                }
+            }
+
+            Ok(())
         }
         _ => unreachable!("Subcommand required settings prevents this."),
     }
@@ -50,6 +113,8 @@ fn main() -> miette::Result<()> {
 
 const TEST_CASES: &[&str] = &[
     "full_unwind",
+    "systick",
+    "svcall",
     "systick",
     "svcall",
     "hardfault_from_usagefault",
@@ -85,16 +150,28 @@ const TARGETS: &[BuildTarget] = &[
     BuildTarget::new_static("esp32c3", "riscv32imc-unknown-none-elf"),
 ];
 
-fn build(settings: &BuildSettings, test_case: &str) -> miette::Result<()> {
-    let sh = xshell::Shell::new().into_diagnostic()?;
+/// Build the test case for all targets
+///
+/// Return the paths to the built binaries
+fn build(
+    sh: &xshell::Shell,
+    settings: &BuildSettings,
+    test_case: &str,
+) -> miette::Result<Vec<PathBuf>> {
+    let repo_root = repo_root();
+
+    let cargo_home = std::env::var("CARGO_HOME").unwrap();
+
+    let cargo_home = Path::new(&cargo_home).canonicalize().unwrap();
 
     // Try to create deterministic builds
-
     if settings.reproducible {
         sh.set_var(
             "RUSTFLAGS",
-            "--remap-path-prefix /Users/tiwalun/.cargo=/Users/jacknoppe/.cargo --remap-path-prefix /Users/tiwalun/code/probe-rs-debugger-test=/Users/jacknoppe/dev/debug/probe-rs-debugger-test");
+            format!("--remap-path-prefix {}=/Users/jacknoppe/.cargo --remap-path-prefix {}=/Users/jacknoppe/dev/debug/probe-rs-debugger-test", cargo_home.display(), repo_root.display()));
     }
+
+    let mut built_binaries = Vec::new();
 
     for t in TARGETS {
         println!("Building for {}", t.chip);
@@ -108,7 +185,7 @@ fn build(settings: &BuildSettings, test_case: &str) -> miette::Result<()> {
 
         let bin_name = t.chip.as_ref();
 
-        let features = vec![t.chip.as_ref()];
+        let features = vec![t.chip.as_ref(), test_case];
         let features_arg = features.join(",");
 
         let mut args = vec!["--features", &features_arg];
@@ -121,11 +198,19 @@ fn build(settings: &BuildSettings, test_case: &str) -> miette::Result<()> {
 
         cmd!(
             sh,
-            "cargo {command} --bin {bin_name} {args...} --target {rust_target} --locked --features {test_case}"
+            "cargo {command} --bin {bin_name} {args...} --target {rust_target} --locked"
         )
         .run()
         .into_diagnostic()?;
+
+        let subfolder = if settings.release { "release" } else { "debug" };
+
+        let chip = t.chip.as_ref();
+
+        let binary_path = repo_root.join(format!("target/{rust_target}/{subfolder}/{chip}"));
+
+        built_binaries.push(binary_path);
     }
 
-    Ok(())
+    Ok(built_binaries)
 }
