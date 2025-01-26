@@ -339,8 +339,14 @@ pub fn test_deep_stack(stack_depth: usize) {
         rprintln!("Returning from call # {} ", internal_depth_measure);
     } else {
         // We force a software breakpoint here, so that our tests can rely on the target state being stopped exactly here.
-        #[cfg(feature = "full_unwind")]
-        software_breakpoint();
+        #[cfg(all(not(feature = "esp32c3"), feature = "full_unwind"))]
+        unsafe {
+            core::arch::asm!("bkpt");
+        }
+        #[cfg(all(feature = "esp32c3", feature = "full_unwind"))]
+        unsafe {
+            core::arch::asm!("ebreak");
+        }
     }
 }
 
@@ -360,11 +366,11 @@ pub fn shared_loop_processing(
 
 #[inline(always)]
 pub fn software_breakpoint() {
-    #[cfg(target_arch = "arm")]
+    #[cfg(not(feature = "esp32c3"))]
     unsafe {
         core::arch::asm!("bkpt");
     }
-    #[cfg(target_arch = "riscv32")]
+    #[cfg(feature = "esp32c3")]
     unsafe {
         core::arch::asm!("ebreak");
     }
@@ -377,13 +383,4 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
         // This breakpoint is to validate that the debugger can unwind the panic handler.
         software_breakpoint();
     }
-}
-
-/// This handles breakpoints when no debugger is attached,
-///
-/// DebugMonitor exception was instroduced in ARMv7-M architecture.
-#[cfg(all(target_arch = "arm", target_feature = "v7"))]
-#[cortex_m_rt::exception]
-fn DebugMonitor() {
-    loop {}
 }
