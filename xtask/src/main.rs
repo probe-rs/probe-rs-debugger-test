@@ -115,11 +115,9 @@ const TEST_CASES: &[&str] = &[
     "full_unwind",
     "systick",
     "svcall",
-    "systick",
-    "svcall",
     "hardfault_from_usagefault",
     "hardfault_from_busfault",
-    "hardfault-in-systick",
+    "hardfault_in_systick",
 ];
 
 #[derive(Debug)]

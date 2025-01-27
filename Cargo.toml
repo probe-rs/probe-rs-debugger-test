@@ -34,7 +34,7 @@ RP2040 = [
     # "svcall",
     # "hardfault_from_usagefault", #TODO: This unwind is incorrect when it transitions from udf() to main()
     # "hardfault_from_busfault",
-    # "hardfault-in-systick" ,
+    # "hardfault_in_systick" ,
 ]
 
 nRF52833_xxAA = [
@@ -49,7 +49,7 @@ nRF52833_xxAA = [
     # "svcall",
     # "hardfault_from_usagefault", #TODO: This unwind is incorrect when it transitions from udf() to main()
     # "hardfault_from_busfault",
-    # "hardfault-in-systick",
+    # "hardfault_in_systick",
 ]
 
 esp32c3 = [
@@ -68,7 +68,7 @@ systick = []
 svcall = []
 hardfault_from_usagefault = []
 hardfault_from_busfault = []
-hardfault-in-systick = ["systick", "hardfault_from_busfault"]
+hardfault_in_systick = ["systick", "hardfault_from_busfault"]
 
 [dependencies]
 # Dependencies shared between different hardware
