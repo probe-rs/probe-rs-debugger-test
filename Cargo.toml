@@ -34,7 +34,7 @@ RP2040 = [
     # "svcall",
     # "hardfault_from_usagefault", #TODO: This unwind is incorrect when it transitions from udf() to main()
     # "hardfault_from_busfault",
-    # "hardfault-in-systick" ,
+    # "hardfault_in_systick" ,
 ]
 
 nRF52833_xxAA = [
@@ -44,20 +44,20 @@ nRF52833_xxAA = [
     "cortex-m/critical-section-single-core",
     "cortex-m/inline-asm",
     # CONFIGUIRE: Enable one of these to test the debugger's ability to unwind specific use cases.
-    "full_unwind",
+    # "full_unwind",
     # "systick",
     # "svcall",
     # "hardfault_from_usagefault", #TODO: This unwind is incorrect when it transitions from udf() to main()
     # "hardfault_from_busfault",
-    # "hardfault-in-systick",
+    # "hardfault_in_systick",
 ]
 
 esp32c3 = [
     "esp-hal",
     "esp-riscv-rt",
     # CONFIGUIRE: Enable one of these to test the debugger's ability to unwind specific use cases.
-    "full_unwind",
-    ]
+    # "full_unwind",
+]
 
 # The following features control which unwind behaviours will be triggered in the code.
 # They are used to test the debugger's ability to handle exceptions, and are optional.
@@ -68,7 +68,7 @@ systick = []
 svcall = []
 hardfault_from_usagefault = []
 hardfault_from_busfault = []
-hardfault-in-systick = ["systick", "hardfault_from_busfault"]
+hardfault_in_systick = ["systick", "hardfault_from_busfault"]
 
 [dependencies]
 # Dependencies shared between different hardware

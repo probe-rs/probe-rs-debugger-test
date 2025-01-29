@@ -13,7 +13,7 @@ fn main() {
         feature = "hardfault_from_busfault",
         feature = "hardfault_in_systick"
     )))]
-    compile_error!("Please enable one of the unwind features in `Carog.toml` to build the project");
+    compile_error!("Please enable one of the unwind features in `Cargo.toml` to build the project");
 
     #[cfg(any(feature = "RP2040", feature = "nRF52833_xxAA", feature = "esp32c3"))]
     {

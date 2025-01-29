@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "preLaunchTask": "probe-rs-debugger-test",
+      //"preLaunchTask": "probe-rs-debugger-test",
       "type": "probe-rs-debug",
       "request": "launch",
       "name": "probe-rs-debugger-test",
@@ -10,7 +10,7 @@
       "coreConfigs": [
         {
           "coreIndex": 0,
-          "programBinary": "./target/${config:rust-analyzer.cargo.target}/${config:probe-rs-profile}/${config:probe-rs-chip}",
+          "programBinary": "/Users/tiwalun/Downloads/test-binaries/nRF52833_xxAA_full_unwind.elf",
           "svdFile": "./svd_files/${config:probe-rs-chip}.svd",
           "rttEnabled": true,
           "rttChannelFormats": [
@@ -30,7 +30,7 @@
         "flashingEnabled": true,
         "haltAfterReset": false
       },
-      // "server": "127.0.0.1:50001", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
+      "server": "127.0.0.1:50000", // OPTIONAL: For connecting to an existing probe-rs-debugger process.
       // "consoleLogLevel": "Debug",
       // "env": {
       // "RUST_LOG": "debug",
@@ -38,5 +38,5 @@
       // },
       "speed": 4000 // CONFIGURE: Optionally update USB speed
     }
-    ]
+  ]
 }
